@@ -1,0 +1,19 @@
+---
+title: "Case Study 2"
+author: "Emily Gentles"
+date: "10/28/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+history <- read.table("history_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
+head(history)
+
+voter <- read.table("voter_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
+head(voter)
+```
+
