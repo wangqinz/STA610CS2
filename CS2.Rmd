@@ -24,5 +24,13 @@ head(voter)
 
 ```{r Data-Cleaning}
 aggregated_data <- aggregate(voter$total_voters,
-                             list(Age=voter$age,Party=voter$party_cd),sum)
+                             list(Age=voter$age,Party=voter$party_cd, race = voter$race_code, 
+                                  sex = voter$sex_code, precinct = voter$precinct_abbrv,
+                                  ethnicity = voter$ethnic_code),sum)
 ```
+
+```{r}
+set.seed(1031)
+counties <- sample(unique(voter$county_desc), 30)
+```
+
