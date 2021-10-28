@@ -7,13 +7,22 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
-```{r}
-history <- read.table("history_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
-head(history)
 
+Tools -> Global Options -> Code -> Display -> Show Margin
+
+```{r}
+# contains info about the aggregate counts of voters who actually voted by demographic variables
+history <- read.table("history_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
+
+# contains info about the aggregate counts of registered voters by demographic variables
 voter <- read.table("voter_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
 head(voter)
 ```
 
+```{r Data-Cleaning}
+aggregated_data <- aggregate(voter$total_voters,
+                             list(Age=voter$age,Party=voter$party_cd),sum)
+```
