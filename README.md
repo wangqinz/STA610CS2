@@ -2,10 +2,10 @@
 
 ### The repo for STA 610 Case Study 2
 
-  -  Emily Gentles   
+  -  Emily Gentles (Writer)
+
+  -  Weiyi Liu (Coordinator and Checker)
   
-  -  Weiyi Liu  
-  
-  -  Jack McCarthy 
-  
-  -  Qinzhe Wang 
+  -  Jack McCarthy (Presenter)  
+ 
+  -  Qinzhe Wang (Coder)  
