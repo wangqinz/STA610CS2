@@ -21,33 +21,33 @@ Tools -> Global Options -> Code -> Display -> Show Margin
 ```{r}
 # contains info about the aggregate counts of voters who actually voted by demographic variables
 
-history <- read.table("history_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
+votes <- read.table("history_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
 
 # contains info about the aggregate counts of registered voters by demographic variables
-voter <- read.table("voter_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
+registers <- read.table("voter_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
 ```
 
 ```{r}
 # set "" or " " to NA
-voter[voter == ""] <- NA
-voter[voter == " "] <- NA
-history[history == " "] <- NA
+registers[registers == ""] <- NA
+registers[registers == " "] <- NA
+votes[votes == " "] <- NA
 
-unique(voter$election_date) # "11/03/2020" NA 
-unique(voter$stats_type) # "history" NA  
-unique(voter$update_date) # "01/13/2021" NA     
+# unique(registers$election_date) # "11/03/2020" NA 
+# unique(registers$stats_type) # "history" NA  
+# unique(registers$update_date) # "01/13/2021" NA     
 
 # remove above three columns
 
-voter <- voter %>%
+registers <- registers %>%
   select(-election_date, -stats_type, -update_date)
-history <- history %>%
+votes <- votes %>%
   select(-election_date, -stats_type, -update_date)
 
-history <- history %>%
+votes <- votes %>%
   mutate(total_voters = as.numeric(total_voters))
 
-voter <- voter %>%
+registers <- registers %>%
   mutate(total_voters2 = as.numeric(total_voters))
 
 ```
@@ -72,17 +72,14 @@ voter <- voter %>%
 
 
 ```{r}
-
-history <- history %>%
+votes <- votes %>%
   group_by(county_desc, age, party_cd, race_code, ethnic_code, sex_code) %>%
   summarize(total_vot = sum(total_voters,na.rm =T))
 
-
-
-data <- voter %>%
+data <- registers %>%
   group_by(county_desc, party_cd, race_code, ethnic_code, sex_code, age) %>%
   summarize(total_reg = sum(total_voters2, na.rm= T)) %>%
-  left_join(history, by = c("county_desc", "age", "party_cd", "race_code",
+  left_join(votes, by = c("county_desc", "age", "party_cd", "race_code",
                       "ethnic_code", "sex_code"))
 
 
@@ -106,9 +103,14 @@ data <- data %>%
 ```{r}
 data <- data %>%
   filter( !is.na(total_reg))
-
 data$total_vot <- ifelse(is.na(data$total_vot), 0, data$total_vot)
 
+data$total_vot <- ifelse(data$total_vot <= data$total_reg, data$total_vot, data$total_reg)
+
+data <- data %>%
+  drop_na()
+
+# 13066 rows
 ```
 
 
@@ -122,9 +124,10 @@ data <- data %>%
 ```
 
 ```{r}
-sum(is.na(data))
 data <- data %>% drop_na()
 ```
+
+
 # EDA
 
 ```{r}
@@ -133,6 +136,25 @@ turnout_rate <- sum(data$total_vot) / sum(data$total_reg)
 data.frame(group = "Total", turnout_rate = turnout_rate)
 
 ```
+
+### turnout rate
+
+```{r}
+data %>%
+  group_by(county_desc) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg) %>%
+  ggplot( aes(x = county_desc, y = turnout_rate)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("County") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  ggtitle("Turnout rate vs. Race") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  coord_flip()
+```
+
 
 ### race
 
@@ -143,13 +165,13 @@ data %>%
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg) %>%
   select(group = race_code, turnout_rate) %>%
-  ggplot( aes(x = reorder(group, turnout_rate), y = turnout_rate)) +
+  ggplot( aes(x = group, y = turnout_rate)) +
   geom_bar(stat = "identity") +
+  ylim(0,1) +
   xlab("Race") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2))) +
-  coord_flip()
-
-
+  geom_text(aes(label=format(turnout_rate, digits = 2)), vjust = -0.5) +
+  ggtitle("Turnout rate vs. Race") +
+    theme(plot.title = element_text(hjust = 0.5))
 ```
 
 
@@ -163,11 +185,13 @@ data %>%
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg) %>%
   select(group = party_cd, turnout_rate) %>%
-  ggplot( aes(x = reorder(group, turnout_rate), y = turnout_rate)) +
+  ggplot( aes(x = group, y = turnout_rate)) +
   geom_bar(stat = "identity") +
+  ylim(0,1) +
   xlab("Party") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2))) +
-  coord_flip()
+  geom_text(aes(label=format(turnout_rate, digits = 2)), vjust = -0.5) +
+  ggtitle("Turnout rate vs. Party") +
+    theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
@@ -180,17 +204,19 @@ data %>%
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg) %>%
   select(group = ethnic_code, turnout_rate) %>%
-  ggplot( aes(x = reorder(group, turnout_rate), y = turnout_rate)) +
+  ggplot( aes(x = group, y = turnout_rate)) +
   geom_bar(stat = "identity") +
-  xlab("Party") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2))) +
-  coord_flip()
+  ylim(0,1) +
+  xlab("Ethnic") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), vjust = -0.5) +
+  ggtitle("Turnout rate vs. Ethnic") +
+    theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
 
 
-### sex
+### Sex
 
 ```{r, warning= F}
 data %>%
@@ -199,11 +225,13 @@ data %>%
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg) %>%
   select(group = sex_code, turnout_rate) %>%
-  ggplot( aes(x = reorder(group, turnout_rate), y = turnout_rate)) +
+  ggplot( aes(x = group, y = turnout_rate)) +
   geom_bar(stat = "identity") +
-  xlab("Party") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2))) +
-  coord_flip()
+  ylim(0,1) +
+  xlab("Sex") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), vjust = -0.5) +
+  ggtitle("Turnout rate vs. Sex") +
+    theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
@@ -216,11 +244,13 @@ data %>%
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg) %>%
   select(group = age, turnout_rate) %>%
-  ggplot( aes(x = reorder(group, turnout_rate), y = turnout_rate)) +
+  ggplot( aes(x = group, y = turnout_rate)) +
   geom_bar(stat = "identity") +
-  xlab("Party") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2))) +
-  coord_flip()
+  ylim(0,1) +
+  xlab("Age") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), vjust = -0.5) +
+  ggtitle("Turnout rate vs. Age") +
+    theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
@@ -233,12 +263,15 @@ data %>%
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg,
          group = paste0(sex_code, " with ", party_cd)) %>%
-  select(group = group, turnout_rate) %>%
-  ggplot( aes(x = reorder(group, turnout_rate), y = turnout_rate)) +
+  select(group = group, turnout_rate, sex_code, party_cd) %>%
+  ggplot( aes(x = group, y = turnout_rate, fill = sex_code)) +
   geom_bar(stat = "identity") +
-  xlab("Party") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2))) +
-  coord_flip()
+  ylim(0,1) +
+  xlab("Sex * Party") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  coord_flip() +
+  ggtitle("Turnout rate vs. Sex*Party") +
+    theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
@@ -251,12 +284,15 @@ data %>%
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg,
          group = paste0(age, " with ", party_cd)) %>%
-  select(group = group, turnout_rate) %>%
-  ggplot( aes(x = reorder(group, turnout_rate), y = turnout_rate)) +
+  select(group = group, turnout_rate, age, party_cd) %>%
+  ggplot( aes(x = group, y = turnout_rate, fill = age)) +
   geom_bar(stat = "identity") +
-  xlab("Party") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2))) +
-  coord_flip()
+  ylim(0,1) +
+  xlab("Age * Party") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  coord_flip() +
+  ggtitle("Turnout rate vs. Age*Party") +
+    theme(plot.title = element_text(hjust = 0.5))
 
 
 ```
@@ -271,12 +307,15 @@ data %>%
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg,
          group = paste0(age, " with ", race_code)) %>%
-  select(group = group, turnout_rate) %>%
-  ggplot( aes(x = reorder(group, turnout_rate), y = turnout_rate)) +
+  select(group = group, turnout_rate, age, race_code) %>%
+  ggplot( aes(x = group, y = turnout_rate, fill = age)) +
   geom_bar(stat = "identity") +
-  xlab("Party") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2))) +
-  coord_flip()
+  ylim(0,1) +
+  xlab("Age * Race") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  coord_flip() +
+  ggtitle("Turnout rate vs. Age*Race") +
+    theme(plot.title = element_text(hjust = 0.5))
 
 
 ```
