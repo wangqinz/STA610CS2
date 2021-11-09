@@ -1,10 +1,10 @@
 ---
 title: "Case Study 2"
 author:   
-  -  Emily Gentles 
-  -  Weiyi Liu
-  -  Jack McCarthy  
-  -  Qinzhe Wang  
+  -  Emily Gentles (Writer)
+  -  Weiyi Liu (Coordinator and Checker)
+  -  Jack McCarthy (Presenter)  
+  -  Qinzhe Wang (Coder)  
 date: "10/28/2021"
 output: pdf_document
 ---
