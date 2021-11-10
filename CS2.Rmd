@@ -15,6 +15,7 @@ library(tidyverse)
 library(lme4)
 ```
 
+Explication of abbreviations: https://s3.amazonaws.com/dl.ncsbe.gov/data/layout_ncvoter.txt
 
 ```{r}
 # contains info about the aggregate counts of voters who actually voted by demographic variables
