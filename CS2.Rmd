@@ -349,8 +349,6 @@ chart_fixef <- function(model) {
 }
 ```
 
-
-
 ```{r}
 # expand data from aggregated format
 data_expand <- data %>%
