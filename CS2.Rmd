@@ -6,13 +6,18 @@ author:
   -  Jack McCarthy (Presenter)  
   -  Qinzhe Wang (Coder)  
 date: "10/28/2021"
-output: pdf_document
+output: 
+  pdf_document:
+    keep_tex: true
+    latex_engine: xelatex
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = T, cache = T)
 library(tidyverse)
 library(lme4)
+library(lattice)
+library(kableExtra)
 ```
 
 
@@ -29,8 +34,7 @@ registers <- read.table("voter_stats_20201103.txt", header = TRUE, fill = TRUE, 
 
 ```{r}
 # set "" or " " to NA
-registers[registers == ""] <- NA
-registers[registers == " "] <- NA
+registers[registers %in% c("", " ")] <- NA
 votes[votes == " "] <- NA
 
 # unique(registers$election_date) # "11/03/2020" NA 
@@ -40,16 +44,12 @@ votes[votes == " "] <- NA
 # remove above three columns
 
 registers <- registers %>%
-  select(-election_date, -stats_type, -update_date)
-votes <- votes %>%
-  select(-election_date, -stats_type, -update_date)
-
-votes <- votes %>%
-  mutate(total_voters = as.numeric(total_voters))
-
-registers <- registers %>%
+  select(-c(election_date, stats_type, update_date)) %>%
   mutate(total_voters2 = as.numeric(total_voters))
 
+votes <- votes %>%
+  select(-c(election_date, stats_type, update_date)) %>%
+  mutate(total_voters = as.numeric(total_voters))
 ```
 
 
@@ -74,57 +74,54 @@ registers <- registers %>%
 ```{r}
 votes <- votes %>%
   group_by(county_desc, age, party_cd, race_code, ethnic_code, sex_code) %>%
-  summarize(total_vot = sum(total_voters,na.rm =T))
+  summarize(total_vot = sum(total_voters, na.rm = T))
 
 data <- registers %>%
   group_by(county_desc, party_cd, race_code, ethnic_code, sex_code, age) %>%
-  summarize(total_reg = sum(total_voters2, na.rm= T)) %>%
-  left_join(votes, by = c("county_desc", "age", "party_cd", "race_code",
-                      "ethnic_code", "sex_code"))
-
-
-
+  summarize(total_reg = sum(total_voters2, na.rm = T)) %>%
+  left_join(votes, by = c(
+    "county_desc", "age", "party_cd", "race_code", "ethnic_code", "sex_code"
+  ))
 ```
 
 
 ```{r}
 data <- data %>%
-  mutate(total_vot = as.numeric(total_vot), 
-         total_reg = as.numeric(total_reg), 
-         county_desc = as.factor(county_desc), 
-         party_cd = as.factor(party_cd), 
-         race_code = as.factor(race_code), 
-         sex_code = as.factor(sex_code), 
-         ethnic_code = as.factor(ethnic_code), 
-         age = as.factor(age))
-
+  mutate(
+    total_vot = as.numeric(total_vot), 
+    total_reg = as.numeric(total_reg), 
+    county_desc = as.factor(county_desc), 
+    party_cd = as.factor(party_cd), 
+    race_code = as.factor(race_code), 
+    sex_code = as.factor(sex_code), 
+    ethnic_code = as.factor(ethnic_code), 
+    age = as.factor(age)
+  )
 ```
 
 ```{r}
-data <- data %>%
-  filter( !is.na(total_reg))
-data$total_vot <- ifelse(is.na(data$total_vot), 0, data$total_vot)
-
-data$total_vot <- ifelse(data$total_vot <= data$total_reg, data$total_vot, data$total_reg)
-
-data <- data %>%
-  drop_na()
-
 # 13066 rows
+data <- data %>%
+  filter(!is.na(total_reg)) %>%
+  mutate(
+    total_vot = case_when(
+      is.na(total_vot) ~ 0,
+      total_vot > total_reg ~ total_reg,
+      TRUE ~ total_vot
+    )
+  ) %>%
+  drop_na()
 ```
 
 
 
 ```{r}
 set.seed(1031)
+
 counties <- sample(unique(data$county_desc), 30)
 
 data <- data %>%
   filter(county_desc %in% counties)
-```
-
-```{r}
-data <- data %>% drop_na()
 ```
 
 
@@ -134,7 +131,6 @@ data <- data %>% drop_na()
 turnout_rate <- sum(data$total_vot) / sum(data$total_reg)
 
 data.frame(group = "Total", turnout_rate = turnout_rate)
-
 ```
 
 ### turnout rate
@@ -146,13 +142,13 @@ data %>%
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg) %>%
   ggplot( aes(x = county_desc, y = turnout_rate)) +
-  geom_bar(stat = "identity") +
-  ylim(0,1) +
-  xlab("County") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
-  ggtitle("Turnout rate vs. Race") +
-    theme(plot.title = element_text(hjust = 0.5)) +
-  coord_flip()
+    geom_bar(stat = "identity") +
+    ylim(0,1) +
+    xlab("County") + ylab("Turnout rate") +
+    geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+    ggtitle("Turnout rate vs. County") +
+      theme(plot.title = element_text(hjust = 0.5)) +
+    coord_flip()
 ```
 
 
@@ -316,39 +312,81 @@ data %>%
   coord_flip() +
   ggtitle("Turnout rate vs. Age*Race") +
     theme(plot.title = element_text(hjust = 0.5))
-
-
 ```
 
 # Model
 
+In order to answer the questions of interest, we require the following features in our model:
+
+1. Fixed effects for various demographic subgroups (race, ethnicity, age, sex)
+2. Random effects for county
+3. Sex-Party interaction
+4. Age-Party interaction
 
 ```{r}
-# attach(data)
-# mod1 <- glmer(cbind(total_vot, total_reg - total_vot) ~
-#                       party_cd + race_code + ethnic_code + sex_code + age + (1|county_desc),
-#                     data = data, family = binomial,
-#               control=glmerControl(optimizer = "bobyqa"))
+mod1 <- glmer(cbind(total_vot, total_reg - total_vot) ~
+                      1 + (1|county_desc),
+                    data = data, family = binomial,
+              control=glmerControl(optimizer = "bobyqa"))
+```
+
+
+```{r}
+as.data.frame(summary(mod1)$coefficients) %>%
+  mutate(`95% CI` = paste0(
+    '[', 
+    round(Estimate - 1.96 * `Std. Error`, 3), ', ', 
+    round(Estimate + 1.96 * `Std. Error`, 3), ']' )
+  ) %>%
+  select(Estimate, `95% CI`) %>%
+  kable(digits=3) %>%
+  kable_styling(full_width=FALSE) %>%
+  kable_classic()
 ```
 
 
 
-
-
-
 ```{r}
- # glmer(cbind(cbind(total_vot, total_reg - total_vot) ~
- #                  party_cd + race_code + ethnic_code + sex_code + age +
- #                  sex_code:party_cd + age:party_cd + age:race_code + (1|county_desc),
- #                data = data, family = binomial)
+library(pROC)
 
+data_expand <- data %>%
+  mutate(resp = map2(total_vot, total_reg, ~ c(
+    rep(1, .x), rep(0, .y - .x)
+  ))) %>%
+  unnest(cols = c(resp)) %>%
+  select(-c(total_reg, total_vot))
+
+sample <- sample(c(TRUE, FALSE), nrow(data_expand), replace=TRUE, prob=c(0.7,0.3))
+train <- data_expand[sample,]
+test <- data_expand[!sample,]
+
+# mod2 <- glmer(resp ~ 1 + party_cd + (1 | county_desc),
+#               data = train, family = binomial)
+
+as.data.frame(summary(mod2)$coefficients) %>%
+  mutate(`95% CI` = paste0(
+    '[', 
+    round(Estimate - 1.96 * `Std. Error`, 3), ', ', 
+    round(Estimate + 1.96 * `Std. Error`, 3), ']' )
+  ) %>%
+  select(Estimate, `95% CI`) %>%
+  kable(digits=3) %>%
+  kable_styling(full_width=FALSE) %>%
+  kable_classic()
+
+predicted <- predict(mod2, test, type="response")
+
+rocobj <- roc(test$resp, predicted)
+
+ggroc(rocobj, size=1) +
+  coord_fixed() +
+  geom_abline(intercept=1, slope=1, linetype="dashed", color="red") +
+  theme_bw()
 ```
 
 
 
 ```{r}
-
-
 ```
 
 
