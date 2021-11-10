@@ -16,8 +16,6 @@ library(lme4)
 ```
 
 
-Tools -> Global Options -> Code -> Display -> Show Margin
-
 ```{r}
 # contains info about the aggregate counts of voters who actually voted by demographic variables
 
@@ -101,8 +99,8 @@ data <- data %>%
 ```
 
 ```{r}
-data <- data %>%
-  filter( !is.na(total_reg))
+#data <- data %>%
+#  filter( !is.na(total_reg))
 data$total_vot <- ifelse(is.na(data$total_vot), 0, data$total_vot)
 
 data$total_vot <- ifelse(data$total_vot <= data$total_reg, data$total_vot, data$total_reg)
@@ -125,6 +123,10 @@ data <- data %>%
 
 ```{r}
 data <- data %>% drop_na()
+
+# 3808 rows
+
+data$race_code <- recode_factor(data$race_code, M = "Multiracial", U = "Undesignated")
 ```
 
 
@@ -150,9 +152,10 @@ data %>%
   ylim(0,1) +
   xlab("County") + ylab("Turnout rate") +
   geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
-  ggtitle("Turnout rate vs. Race") +
+  ggtitle("Turnout Rate by County") +
     theme(plot.title = element_text(hjust = 0.5)) +
-  coord_flip()
+  geom_hline(yintercept = turnout_rate, color = 'red') +
+  coord_flip() 
 ```
 
 
@@ -171,7 +174,7 @@ data %>%
   xlab("Race") + ylab("Turnout rate") +
   geom_text(aes(label=format(turnout_rate, digits = 2)), vjust = -0.5) +
   ggtitle("Turnout rate vs. Race") +
-    theme(plot.title = element_text(hjust = 0.5))
+    theme(plot.title = element_text(hjust = 0.5)) 
 ```
 
 
