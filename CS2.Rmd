@@ -400,8 +400,12 @@ train <- data_expand[sample,]
 test <- data_expand[!sample,]
 
 # fit model on train data
-mod2 <- glmer(resp ~ 1 + party_cd + (1 | county_desc),
-              data = train, family = binomial)
+
+### fit any model you like on unaggregated train data 
+### will take a while...
+
+# mod2 <- glmer(resp ~ 1 + party_cd + (1 | county_desc),
+#               data = train, family = binomial)
 
 # ROC + AUC
 predicted <- predict(mod2, test, type="response")
@@ -422,17 +426,21 @@ ggroc(rocobj, size=1) +
   labs(title=paste("AUC:", round(rocobj$auc, 3))) +
   theme_bw()
 
-mod3 <- glmer(resp ~ 1 + party_cd + sex_code:party_cd + (1 | county_desc),
-              data = data_expand, family = binomial)
+# fit model on full data
+
+mod3 <- glmer(cbind(total_vot, total_reg - total_vot) ~
+                1 + party_cd + sex_code:party_cd + (1|county_desc),
+              data = data, family = binomial,
+              control=glmerControl(optimizer = "bobyqa"))
 
 # Fixed Effects
-chart_fixef(mod2)
+chart_fixef(mod3)
 
 # Random Effects
-dotplot(ranef(mod2))
+dotplot(ranef(mod3))
 
 #
-binned_residuals(mod2)
+binned_residuals(mod3)
 ```
 
 
