@@ -16,6 +16,7 @@ library(lme4)
 library(pROC)
 library(kableExtra)
 library(performance)
+library(lattice)
 ```
 
 Explication of abbreviations: https://s3.amazonaws.com/dl.ncsbe.gov/data/layout_ncvoter.txt
@@ -426,6 +427,9 @@ mod3 <- glmer(resp ~ 1 + party_cd + sex_code:party_cd + (1 | county_desc),
 
 # Fixed Effects
 chart_fixef(mod2)
+
+# Random Effects
+dotplot(ranef(mod2))
 
 #
 binned_residuals(mod2)
