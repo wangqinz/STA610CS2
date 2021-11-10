@@ -13,6 +13,9 @@ output: pdf_document
 knitr::opts_chunk$set(echo = T, cache = T)
 library(tidyverse)
 library(lme4)
+library(pROC)
+library(kableExtra)
+library(performance)
 ```
 
 Explication of abbreviations: https://s3.amazonaws.com/dl.ncsbe.gov/data/layout_ncvoter.txt
@@ -350,9 +353,82 @@ data %>%
 
 
 
+In order to answer the questions of interest, we require the following features in our model:
+
+1. Fixed effects for various demographic subgroups (race, ethnicity, age, sex)
+2. Random effects for county
+3. Sex-Party interaction
+4. Age-Party interaction
+
 ```{r}
+mod1 <- glmer(cbind(total_vot, total_reg - total_vot) ~
+                      1 + (1|county_desc),
+                    data = data, family = binomial,
+              control=glmerControl(optimizer = "bobyqa"))
+```
 
 
+```{r}
+chart_fixef <- function(model) {
+  summary(model)$coefficients %>%
+    as.data.frame() %>%
+    mutate(`95% CI` = paste0(
+      '[', 
+      round(Estimate - 1.96 * `Std. Error`, 3), ', ', 
+      round(Estimate + 1.96 * `Std. Error`, 3), ']' )
+    ) %>%
+    select(Estimate, `95% CI`) %>%
+    kable(digits=3) %>%
+    kable_styling(full_width=FALSE) %>%
+    kable_classic()
+}
+```
+
+```{r}
+# expand data from aggregated format
+data_expand <- data %>%
+  mutate(resp = map2(total_vot, total_reg, ~ c(
+    rep(1, .x), rep(0, .y - .x)
+  ))) %>%
+  unnest(cols = c(resp)) %>%
+  select(-c(total_reg, total_vot))
+
+# split into train and test
+sample <- sample(c(TRUE, FALSE), nrow(data_expand), replace=TRUE, prob=c(0.7,0.3))
+train <- data_expand[sample,]
+test <- data_expand[!sample,]
+
+# fit model on train data
+mod2 <- glmer(resp ~ 1 + party_cd + (1 | county_desc),
+              data = train, family = binomial)
+
+# ROC + AUC
+predicted <- predict(mod2, test, type="response")
+rocobj <- roc(test$resp, predicted)
+ggroc(rocobj, size=1) +
+  coord_fixed() +
+  scale_x_reverse(
+    name = "Specificity", 
+    limits = c(1,0), 
+    expand = c(0.001,0.001)
+  ) + 
+  scale_y_continuous(
+    name = "Sensitivity", 
+    limits = c(0,1), 
+    expand = c(0.001, 0.001)
+  ) +
+  geom_abline(intercept=1, slope=1, linetype="dashed", color="red") +
+  labs(title=paste("AUC:", round(rocobj$auc, 3))) +
+  theme_bw()
+
+mod3 <- glmer(resp ~ 1 + party_cd + sex_code:party_cd + (1 | county_desc),
+              data = data_expand, family = binomial)
+
+# Fixed Effects
+chart_fixef(mod2)
+
+#
+binned_residuals(mod2)
 ```
 
 
