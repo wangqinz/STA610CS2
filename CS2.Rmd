@@ -17,6 +17,8 @@ library(pROC)
 library(kableExtra)
 library(performance)
 library(lattice)
+library(brms)
+library(reshape2)
 ```
 
 Explication of abbreviations: https://s3.amazonaws.com/dl.ncsbe.gov/data/layout_ncvoter.txt
@@ -363,11 +365,13 @@ In order to answer the questions of interest, we require the following features 
 
 ```{r}
 mod1 <- glmer(cbind(total_vot, total_reg - total_vot) ~
-                      1 + (1|county_desc),
+                      -1 + race_code + ethnic_code + sex_code + age + (1 | county_desc),
                     data = data, family = binomial,
-              control=glmerControl(optimizer = "bobyqa"))
+              control=glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=2e5)))
 ```
-
+```{r}
+summary(mod1)
+```
 
 ```{r}
 chart_fixef <- function(model) {
@@ -440,45 +444,44 @@ chart_fixef(mod3)
 dotplot(ranef(mod3))
 
 #
-binned_residuals(mod3)
+test <- binned_residuals(mod3)
 ```
 
 
 
 ```{r}
-
-
+mod <- brm(
+  data = data, family = binomial,
+  total_vot | trials(total_reg) ~ 1 + party_cd + (1 | county_desc),
+  prior = c(prior(normal(0, 10), class = Intercept),
+            prior(normal(0, 1), class = b)),
+  iter = 2500, warmup = 500, cores = 4, chains = 2,
+  seed = 10
+)
 ```
 
+```{r}
+fixef(mod) %>%
+  as.data.frame() %>%
+  mutate(`95% CI` = paste0(
+    "[", round(Q2.5, 3), ",", round(Q97.5, 3), "]"
+  )) %>%
+  select(-c(Est.Error, Q2.5, Q97.5)) %>%
+  kable(digits=3) %>%
+  kable_classic() %>%
+  kable_styling(full_width=FALSE)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ranef(mod)$county_desc %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column(var="County") %>%
+  ggplot(aes(y=reorder(County, Estimate.Intercept), x=Estimate.Intercept)) +
+    geom_point(color="blue", size=2) +
+    geom_linerange(aes(
+      xmin=Q2.5.Intercept, xmax=Q97.5.Intercept
+    )) +
+    labs(
+      x="Intercept",
+      y="County"
+    ) +
+    theme_bw()
+```
