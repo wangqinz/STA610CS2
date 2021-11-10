@@ -18,6 +18,8 @@ library(tidyverse)
 library(lme4)
 library(lattice)
 library(kableExtra)
+library(pROC)
+library(performance)
 ```
 
 
@@ -332,23 +334,25 @@ mod1 <- glmer(cbind(total_vot, total_reg - total_vot) ~
 
 
 ```{r}
-as.data.frame(summary(mod1)$coefficients) %>%
-  mutate(`95% CI` = paste0(
-    '[', 
-    round(Estimate - 1.96 * `Std. Error`, 3), ', ', 
-    round(Estimate + 1.96 * `Std. Error`, 3), ']' )
-  ) %>%
-  select(Estimate, `95% CI`) %>%
-  kable(digits=3) %>%
-  kable_styling(full_width=FALSE) %>%
-  kable_classic()
+chart_fixef <- function(model) {
+  summary(model)$coefficients %>%
+    as.data.frame() %>%
+    mutate(`95% CI` = paste0(
+      '[', 
+      round(Estimate - 1.96 * `Std. Error`, 3), ', ', 
+      round(Estimate + 1.96 * `Std. Error`, 3), ']' )
+    ) %>%
+    select(Estimate, `95% CI`) %>%
+    kable(digits=3) %>%
+    kable_styling(full_width=FALSE) %>%
+    kable_classic()
+}
 ```
 
 
 
 ```{r}
-library(pROC)
-
+# expand data from aggregated format
 data_expand <- data %>%
   mutate(resp = map2(total_vot, total_reg, ~ c(
     rep(1, .x), rep(0, .y - .x)
@@ -356,51 +360,34 @@ data_expand <- data %>%
   unnest(cols = c(resp)) %>%
   select(-c(total_reg, total_vot))
 
+# split into train and test
 sample <- sample(c(TRUE, FALSE), nrow(data_expand), replace=TRUE, prob=c(0.7,0.3))
 train <- data_expand[sample,]
 test <- data_expand[!sample,]
 
-# mod2 <- glmer(resp ~ 1 + party_cd + (1 | county_desc),
-#               data = train, family = binomial)
+mod2 <- glmer(resp ~ 1 + party_cd + (1 | county_desc),
+              data = train, family = binomial)
 
-as.data.frame(summary(mod2)$coefficients) %>%
-  mutate(`95% CI` = paste0(
-    '[', 
-    round(Estimate - 1.96 * `Std. Error`, 3), ', ', 
-    round(Estimate + 1.96 * `Std. Error`, 3), ']' )
-  ) %>%
-  select(Estimate, `95% CI`) %>%
-  kable(digits=3) %>%
-  kable_styling(full_width=FALSE) %>%
-  kable_classic()
+# Fixed Effects
+chart_fixef(mod2)
 
+# ROC + AUC
 predicted <- predict(mod2, test, type="response")
-
 rocobj <- roc(test$resp, predicted)
 
 ggroc(rocobj, size=1) +
   coord_fixed() +
+  scale_x_reverse(name = "Specificity",limits = c(1,0), expand = c(0.001,0.001)) + 
+  scale_y_continuous(name = "Sensitivity", limits = c(0,1), expand = c(0.001, 0.001)) +
   geom_abline(intercept=1, slope=1, linetype="dashed", color="red") +
+  labs(title=paste("AUC:", round(rocobj$auc, 3))) +
   theme_bw()
+
+mod3 <- glmer(resp ~ 1 + party_cd + (1 | county_desc),
+              data = data_expand, family = binomial)
+
+binned_residuals(mod3)
 ```
-
-
-
-```{r}
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-
-
-
 
 
 
