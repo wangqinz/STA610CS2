@@ -364,14 +364,6 @@ glmer(cbind(cbind(total_vot, total_reg - total_vot)) ~
 
 
 
-<<<<<<< HEAD
-```{r}
-glmer(total_vot / total_reg ~
-                  party_cd + race_code + ethnic_code + sex_code + age +
-                  sex_code:party_cd + age:party_cd + age:race_code + (1|county_desc),
-                data = data, family = binomial,
-      control=glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=2e4)))
-=======
 In order to answer the questions of interest, we require the following features in our model:
 
 1. Fixed effects for various demographic subgroups (race, ethnicity, age, sex)
@@ -384,14 +376,10 @@ mod1 <- glmer(cbind(total_vot, total_reg - total_vot) ~
                       -1 + race_code + ethnic_code + sex_code + age + (1 | county_desc),
                     data = data, family = binomial,
               control=glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=2e5)))
->>>>>>> fd6efffe9130caeaee3347029fdaf7373fa7b03e
 ```
-```{r}
-<<<<<<< HEAD
 
-=======
+```{r}
 summary(mod1)
->>>>>>> fd6efffe9130caeaee3347029fdaf7373fa7b03e
 ```
 
 ```{r}
