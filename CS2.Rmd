@@ -176,6 +176,8 @@ data %>%
   geom_text(aes(label=format(turnout_rate, digits = 2)), vjust = -0.5) +
   ggtitle("Turnout rate vs. Race") +
     theme(plot.title = element_text(hjust = 0.5)) 
+
+data$race_code <- droplevels(data$race_code, 'P')
 ```
 
 
@@ -324,6 +326,11 @@ data %>%
 
 ```
 
+```{r}
+pairs(data[,1:6])
+```
+
+
 # Model
 
 
@@ -341,24 +348,27 @@ data %>%
 
 
 ```{r}
- # glmer(cbind(cbind(total_vot, total_reg - total_vot) ~
- #                  party_cd + race_code + ethnic_code + sex_code + age +
- #                  sex_code:party_cd + age:party_cd + age:race_code + (1|county_desc),
- #                data = data, family = binomial)
+glmer(cbind(cbind(total_vot, total_reg - total_vot)) ~
+                  party_cd + race_code + ethnic_code + sex_code + age +
+                  sex_code:party_cd + age:party_cd + age:race_code + (1|county_desc),
+                data = data, family = binomial,
+      control=glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=2e4)))
 
 ```
 
 
 
 ```{r}
-
-
+glmer(total_vot / total_reg ~
+                  party_cd + race_code + ethnic_code + sex_code + age +
+                  sex_code:party_cd + age:party_cd + age:race_code + (1|county_desc),
+                data = data, family = binomial,
+      control=glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=2e4)))
 ```
 
 
 
 ```{r}
-
 
 ```
 
