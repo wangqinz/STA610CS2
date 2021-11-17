@@ -402,6 +402,7 @@ mod2 <- glmer(cbind(total_vot, total_reg - total_vot) ~
                     data = data, family = binomial,
               control=glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=2e5)))
 
+BIC(mod2)
 ```
 
 
@@ -413,7 +414,7 @@ mod3 <- glmer(cbind(total_vot, total_reg - total_vot) ~
                 data = data, family = binomial,
               control=glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=2e5)))
 
-# fail to converge
+BIC(mod3)
 
 ```
 
@@ -427,6 +428,24 @@ mod4 <- glmer(cbind(cbind(total_vot, total_reg - total_vot)) ~
 BIC(mod4)
 ```
 
+```{r}
+
+model <- c("Base model",
+           "Without intercept",
+           "Add the interaction of sex and party_cd, and age and party",
+           "Add the interaction of sex and party_cd, age and party, and age and race")
+LRT <- c("",
+         round(anova(mod1,mod2)$`Pr(>Chisq)`[2],4),
+         round(anova(mod1,mod3)$`Pr(>Chisq)`[2],4),
+         round(anova(mod3,mod4)$`Pr(>Chisq)`[2],4))
+BIC_score1 <- sapply(c(mod1, mod2, mod3, mod4), BIC)
+data.frame("Model" = model, 'LRT p-value' = LRT, 'BIC' = BIC_score1) %>%
+  kable(caption = "Forward model selection") %>%
+    kable_styling(latex_options = c("HOLD_position","striped"))
+
+```
+
+
 
 
 In order to answer the questions of interest, we require the following features in our model:
@@ -437,14 +456,7 @@ In order to answer the questions of interest, we require the following features 
 4. Age-Party interaction
 
 ```{r}
-mod1 <- glmer(cbind(total_vot, total_reg - total_vot) ~
-                      -1 + race_code + ethnic_code + sex_code + age + (1 | county_desc),
-                    data = data, family = binomial,
-              control=glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=2e5)))
-```
-
-```{r}
-summary(mod1)
+summary(mod4)
 ```
 
 ```{r}
@@ -506,19 +518,21 @@ ggroc(rocobj, size=1) +
 
 # fit model on full data
 
-mod3 <- glmer(cbind(total_vot, total_reg - total_vot) ~
+mod4 <- glmer(cbind(total_vot, total_reg - total_vot) ~
                 1 + party_cd + sex_code:party_cd + (1|county_desc),
               data = data, family = binomial,
               control=glmerControl(optimizer = "bobyqa"))
 
 # Fixed Effects
-chart_fixef(mod3)
+chart_fixef(mod4)
 
 # Random Effects
-dotplot(ranef(mod3))
+dotplot(ranef(mod4))
 
-#
-test <- binned_residuals(mod3)
+
+test <- binned_residuals(mod4)
+
+
 ```
 
 
