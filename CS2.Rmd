@@ -380,14 +380,13 @@ data <- data %>%
          age = as.factor(age))
 
 
-pairs(data[,1:6])
 ```
 
 
 # Model
 
 
-```{r}
+```{r cache = T}
 # initial
 mod1 <- glmer(cbind(total_vot, total_reg - total_vot) ~
                       party_cd + race_code + ethnic_code + sex_code + age + (1|county_desc),
@@ -396,7 +395,7 @@ mod1 <- glmer(cbind(total_vot, total_reg - total_vot) ~
 BIC(mod1)
 ```
 
-```{r}
+```{r cache = T}
 mod2 <- glmer(cbind(total_vot, total_reg - total_vot) ~
                       -1 + race_code + ethnic_code + sex_code + age + (1 | county_desc),
                     data = data, family = binomial,
@@ -407,7 +406,7 @@ BIC(mod2)
 
 
 
-```{r}
+```{r cache = T}
 mod3 <- glmer(cbind(total_vot, total_reg - total_vot) ~
                   party_cd + race_code + ethnic_code + sex_code + age +
                   sex_code:party_cd + age:party_cd + (1|county_desc),
@@ -415,16 +414,16 @@ mod3 <- glmer(cbind(total_vot, total_reg - total_vot) ~
               control=glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=2e5)))
 
 BIC(mod3)
-
 ```
 
 
-```{r}
+```{r cache = T}
 mod4 <- glmer(cbind(cbind(total_vot, total_reg - total_vot)) ~
                   party_cd + race_code + ethnic_code + sex_code + age +
                   sex_code:party_cd + age:party_cd + age:race_code + (1|county_desc),
                 data = data, family = binomial,
       control=glmerControl(optimizer = "bobyqa",optCtrl=list(maxfun=2e5)))
+
 BIC(mod4)
 ```
 
@@ -534,6 +533,7 @@ test <- binned_residuals(mod4)
 
 
 ```
+
 
 
 
