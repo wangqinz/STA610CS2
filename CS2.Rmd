@@ -197,7 +197,7 @@ p2 <- data %>%
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
-  ggtitle("Sample size vs. Party") +
+  ggtitle("Sample size vs. Race") +
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
@@ -274,7 +274,7 @@ p2 <- data %>%
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
-  ggtitle("Sample size vs. Party") +
+  ggtitle("Sample size vs. Ethnic") +
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
@@ -309,7 +309,7 @@ p2 <- data %>%
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
-  ggtitle("Sample size vs. Party") +
+  ggtitle("Sample size vs. Sex") +
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
@@ -341,7 +341,7 @@ p2 <- data %>%
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
-  ggtitle("Sample size vs. Party") +
+  ggtitle("Sample size vs. Age") +
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
@@ -382,7 +382,7 @@ p2 <- data %>%
 
 legend <- get_legend(p1)
 
-grid.arrange(p1 + theme(legend.position="none"),
+grid.arrange(widths = c(3, 3, 1),p1 + theme(legend.position="none"),
              p2 + theme(legend.position="none"), nrow= 1,legend)
 ```
 
@@ -419,7 +419,7 @@ p2 <- data %>%
 
 legend <- get_legend(p1)
 
-grid.arrange(p1 + theme(legend.position="none"),
+grid.arrange(widths = c(3, 3, 1),p1 + theme(legend.position="none"),
              p2 + theme(legend.position="none"), nrow= 1,legend)
 
 ```
@@ -458,7 +458,7 @@ p2 <- data %>%
 
 legend <- get_legend(p1)
 
-grid.arrange(p1 + theme(legend.position="none"),
+grid.arrange(widths = c(3, 3, 1),p1 + theme(legend.position="none"),
              p2 + theme(legend.position="none"), nrow= 1,legend)
 
 
@@ -647,6 +647,7 @@ dotplot(ranef(mod6))$county_desc
 # 
 # ranef(mod)$county_desc %>%
 #   as.data.frame() %>%
+#   
 #   tibble::rownames_to_column(var="County") %>%
 #   ggplot(aes(y=reorder(County, Estimate.Intercept), x=Estimate.Intercept)) +
 #     geom_point(color="blue", size=2) +
@@ -658,4 +659,6 @@ dotplot(ranef(mod6))$county_desc
 #       y="County"
 #     ) +
 #     theme_bw()
+
+
 ```
