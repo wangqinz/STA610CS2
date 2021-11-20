@@ -157,7 +157,7 @@ p1 <- data %>%
 
 p2 <- data %>%
   group_by(county_desc) %>%
-  summarize(n = n(), .groups="drop") %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = county_desc, y = n)) +
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
@@ -192,7 +192,7 @@ p1 <- data %>%
 
 p2 <- data %>%
   group_by(race_code) %>%
-  summarize(n = n(), .groups="drop") %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = race_code, y = n)) +
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
@@ -231,7 +231,7 @@ p1 <- data %>%
 
 p2 <- data %>%
   group_by(party_cd) %>%
-  summarize(n = n(), .groups="drop") %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = party_cd, y = n)) +
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
@@ -269,7 +269,7 @@ p1 <- data %>%
 
 p2 <- data %>%
   group_by(ethnic_code) %>%
-  summarize(n = n(), .groups="drop") %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = ethnic_code, y = n)) +
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
@@ -304,7 +304,7 @@ grid.arrange(p1,p2, nrow= 1)
 
 p2 <- data %>%
   group_by(sex_code) %>%
-  summarize(n = n(), .groups="drop") %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = sex_code, y = n)) +
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
@@ -336,7 +336,7 @@ p1 <- data %>%
 
 p2 <- data %>%
   group_by(age) %>%
-  summarize(n = n(), .groups="drop") %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = age, y = n)) +
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
@@ -370,7 +370,7 @@ p1 <- data %>%
 
 p2 <- data %>%
   group_by(sex_code, party_cd) %>%
-  summarize(n = n(), .groups = "drop") %>%
+  summarize(n = sum(total_reg), .groups = "drop") %>%
   mutate(group = paste0(sex_code, " with ", party_cd)) %>%
   ggplot( aes(x = group, y = n, fill = sex_code)) +
   geom_bar(stat = "identity") +
@@ -407,7 +407,7 @@ p1 <- data %>%
 
 p2 <- data %>%
   group_by(age, party_cd) %>%
-  summarize(n = n(), .groups = "drop") %>%
+  summarize(n = sum(total_reg), .groups = "drop") %>%
   mutate(group = paste0(age, " with ", party_cd)) %>%
   ggplot( aes(x = group, y = n, fill = age)) +
   geom_bar(stat = "identity") +
@@ -446,7 +446,7 @@ p1 <- data %>%
 
 p2 <- data %>%
   group_by(age, race_code) %>%
-  summarize(n = n(), .groups = "drop") %>%
+  summarize(n = sum(total_reg), .groups = "drop") %>%
   mutate(group = paste0(age, " with ", race_code)) %>%
   ggplot( aes(x = group, y = n, fill = age)) +
   geom_bar(stat = "identity") +
