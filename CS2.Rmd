@@ -24,7 +24,7 @@ library(gridExtra)
 library(cowplot)
 ```
 
-Explication of abbreviations: https://s3.amazonaws.com/dl.ncsbe.gov/data/layout_ncvoter.txt
+Explanation of abbreviations: https://s3.amazonaws.com/dl.ncsbe.gov/data/layout_ncvoter.txt
 
 ```{r}
 # contains info about the aggregate counts of voters who actually voted by demographic variables
@@ -98,6 +98,7 @@ data$total_vot <- ifelse(data$total_vot <= data$total_reg, data$total_vot, data$
 data <- data %>%
   drop_na()
 
+# 51883 rows
 ```
 
 
@@ -109,6 +110,7 @@ counties <- sample(unique(data$county_desc), 30)
 data <- data %>%
   filter(county_desc %in% counties)
 
+# 16439 rows
 ```
 
 ```{r}
@@ -122,6 +124,7 @@ data2 <- data %>%
   unnest(cols = c(row_expand)) %>%
   select(-prob, -row_expand)
 
+# 1,908,907 individuals
 ```
 
 # EDA
@@ -377,7 +380,7 @@ p2 <- data %>%
   xlab("Age * Party") + ylab("Size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.3) +
   coord_flip() +
-  ggtitle("Turnout rate vs. Age*Party") +
+  ggtitle("Sample Size vs. Age*Party") +
     theme(plot.title = element_text(hjust = 0.5))
 
 legend <- get_legend(p1)
@@ -414,7 +417,7 @@ p2 <- data %>%
   xlab("Age * Party") + ylab("Size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.3) +
   coord_flip() +
-  ggtitle("Turnout rate vs. Age*Party") +
+  ggtitle("Sample Size vs. Age*Party") +
     theme(plot.title = element_text(hjust = 0.5))
 
 legend <- get_legend(p1)
@@ -453,7 +456,7 @@ p2 <- data %>%
   xlab("Age * Party") + ylab("Size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.3) +
   coord_flip() +
-  ggtitle("Turnout rate vs. Age*Party") +
+  ggtitle("Sample Size vs. Age*Race") +
     theme(plot.title = element_text(hjust = 0.5))
 
 legend <- get_legend(p1)
