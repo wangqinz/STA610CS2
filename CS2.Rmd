@@ -9,8 +9,13 @@ date: "10/28/2021"
 output: pdf_document
 ---
 
+## Introduction
+
+## Data cleaning
+
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = T, cache = T, message = F, warning =F)
+knitr::opts_chunk$set(echo = F, cache = T, message = F, warning =F)
 library(tidyverse)
 library(lme4)
 library(pROC)
@@ -550,7 +555,7 @@ data.frame("Model" = model, 'LRT p-value' = LRT, 'AIC' = AIC_score, 'BIC' = BIC_
 
 
 ```{r}
-summary(mod6)$coefficients
+# summary(mod6)$coefficients
 ```
 
 ```{r}
@@ -625,43 +630,20 @@ dotplot(ranef(mod6))$county_desc
 ```
 
 
-
-```{r}
-# mod <- brm(
-#   data = data, family = binomial,
-#   total_vot | trials(total_reg) ~ 1 + party_cd + (1 | county_desc),
-#   prior = c(prior(normal(0, 10), class = Intercept),
-#             prior(normal(0, 1), class = b)),
-#   iter = 2500, warmup = 500, cores = 4, chains = 2,
-#   seed = 10
-# )
-```
-
-```{r}
-# fixef(mod) %>%
-#   as.data.frame() %>%
-#   mutate(`95% CI` = paste0(
-#     "[", round(Q2.5, 3), ",", round(Q97.5, 3), "]"
-#   )) %>%
-#   select(-c(Est.Error, Q2.5, Q97.5)) %>%
-#   kable(digits=3) %>%
-#   kable_classic() %>%
-#   kable_styling(full_width=FALSE)
-# 
-# ranef(mod)$county_desc %>%
-#   as.data.frame() %>%
-#   
-#   tibble::rownames_to_column(var="County") %>%
-#   ggplot(aes(y=reorder(County, Estimate.Intercept), x=Estimate.Intercept)) +
-#     geom_point(color="blue", size=2) +
-#     geom_linerange(aes(
-#       xmin=Q2.5.Intercept, xmax=Q97.5.Intercept
-#     )) +
-#     labs(
-#       x="Intercept",
-#       y="County"
-#     ) +
-#     theme_bw()
+## Interpretation
 
 
-```
+## Research Questions
+
+  - How did different demographic subgroups vote in the 2020 general elections? For example, how did the turnout for males compare to the turnout for females after controlling for other potential predictors?
+
+
+  - Did the overall probability or odds of voting differ by county in 2020? Which counties differ the most from other counties?
+
+
+  - How did the turnout rates differ between females and males for the different party affiliations?
+
+
+  - How did the turnout rates differ between age groups for the different party affiliations?
+  
+  
