@@ -6,7 +6,10 @@ author:
   -  Jack McCarthy (Presenter)  
   -  Qinzhe Wang (Coder)  
 date: "10/28/2021"
-output: pdf_document
+output: 
+  pdf_document:
+fontsize: 11pt
+geometry: "left=1.5cm,right=1.5cm,top=1.25cm,bottom=1.75cm"
 ---
 
 ```{r setup, include=FALSE}
@@ -24,9 +27,12 @@ library(gridExtra)
 library(cowplot)
 ```
 
-Explanation of abbreviations: https://s3.amazonaws.com/dl.ncsbe.gov/data/layout_ncvoter.txt
+# Introduction
 
-```{r}
+Voter turnout by a number of different demographics such as age, race and party is a huge topic of interest for both pollsters and candidates, especially around presidential elections and with particular focus on swing states, such as North Caroline. In this case study we will use North Carolina registration and turnout data, by county, for the 2020 election year. We wish to investigate what demographic factors affect turnout and whether turnout differs by county. 
+
+```{r echo = FALSE}
+# Explanation of abbreviations: https://s3.amazonaws.com/dl.ncsbe.gov/data/layout_ncvoter.txt
 # contains info about the aggregate counts of voters who actually voted by demographic variables
 
 votes <- read.table("history_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
@@ -35,7 +41,7 @@ votes <- read.table("history_stats_20201103.txt", header = TRUE, fill = TRUE, se
 registers <- read.table("voter_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
 ```
 
-```{r}
+```{r echo = FALSE}
 # set "" or " " to NA
 registers[registers == ""] <- NA
 registers[registers == " "] <- NA
@@ -60,8 +66,11 @@ registers <- registers %>%
 
 ```
 
+## Data Cleaning
 
-```{r}
+Note that we renamed the history stats 2020-11-03 data as votes and the voterstats 2020-11-03 data as registers. Within the votes and registers data we aggregated the total voters variable by taking the sum, ignoring NA values, and then left joined votes to registers. We next replaced any NA values in total votes with 0. While these values are unlikely to be exactly 0, we chose to do this in order to preserve the information that was present as the alternative would be to throw the entire row away. After this we dropped all of the rows containing NA values in any of the other columns. Since total voters is one of the main variables we care about it made sense to preserve as many rows as possible but if we replaced every NA value in the data with 0 that may potentially introduce a lot of error into the data, as the values are unlikely to be exactly 0, so we instead dropped all of the rows containing NA values, leaving us with 51,883 rows. We next randomly sampled 30 counties to utilize in our analysis, leaving our finall data with 16,439 rows and, after deaggregation, 1,908,907 individuals. 
+
+```{r echo = FALSE}
 votes <- votes %>%
   group_by(county_desc, age, party_cd, race_code, ethnic_code, sex_code) %>%
   summarize(total_vot = sum(total_voters,na.rm =T))
@@ -77,7 +86,7 @@ data <- registers %>%
 ```
 
 
-```{r}
+```{r echo = FALSE}
 data <- data %>%
   mutate(total_vot = as.numeric(total_vot), 
          total_reg = as.numeric(total_reg))
@@ -90,7 +99,7 @@ data <- data %>%
 
 ```
 
-```{r}
+```{r echo = FALSE}
 data$total_vot <- ifelse(is.na(data$total_vot), 0, data$total_vot)
 
 data$total_vot <- ifelse(data$total_vot <= data$total_reg, data$total_vot, data$total_reg)
@@ -103,7 +112,7 @@ data <- data %>%
 
 
 
-```{r}
+```{r echo = FALSE}
 set.seed(10)
 counties <- sample(unique(data$county_desc), 30)
 
@@ -113,7 +122,7 @@ data <- data %>%
 # 16439 rows
 ```
 
-```{r}
+```{r echo = FALSE}
 data$race_code <- recode_factor(data$race_code, M = "Multiracial", U = "Undesignated")
 data2 <- data %>%
   drop_na() %>%
@@ -127,10 +136,10 @@ data2 <- data %>%
 # 1,908,907 individuals
 ```
 
-# EDA
+## EDA
 
 
-```{r}
+```{r echo = FALSE}
 table(data2$vote_or_not)
 
 turnout_rate <- sum(data$total_vot) / sum(data$total_reg)
@@ -140,9 +149,9 @@ data.frame(group = "Total", turnout_rate = turnout_rate)
 ```
 
 
-### turnout rate
+### Turnout Rate
 
-```{r, warning= F, fig.width= 10}
+```{r, warning= F, fig.width= 10, echo = FALSE}
 p1 <- data %>%
   group_by(county_desc) %>%
   summarise(total_reg = sum(total_reg),
@@ -169,14 +178,14 @@ p2 <- data %>%
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
-grid.arrange(p1,p2, nrow= 1)
+ grid.arrange(p1,p2, nrow= 1)
 ```
 
 
 ### race
 
-```{r, warning= F, fig.width= 10, fig.height= 4}
-p1 <- data %>%
+```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE}
+p3 <- data %>%
   group_by(race_code) %>%
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
@@ -193,7 +202,7 @@ p1 <- data %>%
 
 
 
-p2 <- data %>%
+p4 <- data %>%
   group_by(race_code) %>%
   summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = race_code, y = n)) +
@@ -204,7 +213,7 @@ p2 <- data %>%
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
-grid.arrange(p1,p2, nrow= 1)
+grid.arrange(p3,p4, nrow= 1)
 
 
 data$race_code <- droplevels(data$race_code, 'P')
@@ -216,8 +225,8 @@ data <- data %>%
 
 ### party
 
-```{r, warning= F, fig.width= 10, fig.height= 4}
-p1 <- data %>%
+```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE}
+p5 <- data %>%
   group_by(party_cd) %>%
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
@@ -232,7 +241,7 @@ p1 <- data %>%
     theme(plot.title = element_text(hjust = 0.5))  +
     coord_flip()
 
-p2 <- data %>%
+p6 <- data %>%
   group_by(party_cd) %>%
   summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = party_cd, y = n)) +
@@ -243,7 +252,7 @@ p2 <- data %>%
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
-grid.arrange(p1,p2, nrow= 1)
+grid.arrange(p5,p6, nrow= 1)
 
 
 # "CST","GRE" have small smaple size (50,25) and similar turnout rate (0.16,0.15)
@@ -254,8 +263,8 @@ data$party_cd <- ifelse(data$party_cd %in% c("CST","GRE"),"CST_GRE",data$party_c
 
 ### ethnic groups
 
-```{r, warning= F, fig.width= 10, fig.height= 3}
-p1 <- data %>%
+```{r, warning= F, fig.width= 10, fig.height= 3, echo = FALSE}
+p7 <- data %>%
   group_by(ethnic_code) %>%
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
@@ -270,7 +279,7 @@ p1 <- data %>%
     theme(plot.title = element_text(hjust = 0.5))+
     coord_flip()
 
-p2 <- data %>%
+p8 <- data %>%
   group_by(ethnic_code) %>%
   summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = ethnic_code, y = n)) +
@@ -281,7 +290,7 @@ p2 <- data %>%
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
-grid.arrange(p1,p2, nrow= 1)
+grid.arrange(p7,p8, nrow= 1)
 
 ```
 
@@ -289,8 +298,8 @@ grid.arrange(p1,p2, nrow= 1)
 
 ### Sex
 
-```{r, warning= F, fig.width= 10, fig.height= 3}
- p1 <- data %>%
+```{r, warning= F, fig.width= 10, fig.height= 3, echo = FALSE}
+ p9 <- data %>%
   group_by(sex_code) %>%
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
@@ -305,7 +314,7 @@ grid.arrange(p1,p2, nrow= 1)
     theme(plot.title = element_text(hjust = 0.5)) + 
     coord_flip()
 
-p2 <- data %>%
+p10 <- data %>%
   group_by(sex_code) %>%
   summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = sex_code, y = n)) +
@@ -316,13 +325,13 @@ p2 <- data %>%
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
-grid.arrange(p1,p2, nrow= 1)
+grid.arrange(p9,p10, nrow= 1)
 ```
 
 ### age
 
-```{r, warning= F, fig.width= 10, fig.height= 4}
-p1 <- data %>%
+```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE}
+p11 <- data %>%
   group_by(age) %>%
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
@@ -337,7 +346,7 @@ p1 <- data %>%
     theme(plot.title = element_text(hjust = 0.5))+
     coord_flip()
 
-p2 <- data %>%
+p12 <- data %>%
   group_by(age) %>%
   summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = age, y = n)) +
@@ -348,14 +357,14 @@ p2 <- data %>%
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
-grid.arrange(p1,p2, nrow= 1)
+grid.arrange(p11,p12, nrow= 1)
 
 ```
 
 ### sex & party
 
-```{r, warning= F, fig.width= 10}
-p1 <- data %>%
+```{r, warning= F, fig.width= 10, echo = FALSE}
+p13 <- data %>%
   group_by(sex_code, party_cd) %>%
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
@@ -371,7 +380,7 @@ p1 <- data %>%
   ggtitle("Turnout rate vs. Sex*Party") +
     theme(plot.title = element_text(hjust = 0.5))
 
-p2 <- data %>%
+p14 <- data %>%
   group_by(sex_code, party_cd) %>%
   summarize(n = sum(total_reg), .groups = "drop") %>%
   mutate(group = paste0(sex_code, " with ", party_cd)) %>%
@@ -383,16 +392,16 @@ p2 <- data %>%
   ggtitle("Sample Size vs. Age*Party") +
     theme(plot.title = element_text(hjust = 0.5))
 
-legend <- get_legend(p1)
+legend <- get_legend(p13)
 
-grid.arrange(widths = c(3, 3, 1),p1 + theme(legend.position="none"),
-             p2 + theme(legend.position="none"), nrow= 1,legend)
+grid.arrange(widths = c(3, 3, 1),p13 + theme(legend.position="none"),
+             p14 + theme(legend.position="none"), nrow= 1,legend)
 ```
 
 ###  age & party
 
-```{r, warning= F, fig.width= 10}
-p1 <- data %>%
+```{r, warning= F, fig.width= 10, echo = FALSE}
+p15 <- data %>%
   group_by(age, party_cd) %>%
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
@@ -408,7 +417,7 @@ p1 <- data %>%
   ggtitle("Turnout rate vs. Age*Party") +
     theme(plot.title = element_text(hjust = 0.5))
 
-p2 <- data %>%
+p16 <- data %>%
   group_by(age, party_cd) %>%
   summarize(n = sum(total_reg), .groups = "drop") %>%
   mutate(group = paste0(age, " with ", party_cd)) %>%
@@ -420,18 +429,18 @@ p2 <- data %>%
   ggtitle("Sample Size vs. Age*Party") +
     theme(plot.title = element_text(hjust = 0.5))
 
-legend <- get_legend(p1)
+legend <- get_legend(p15)
 
-grid.arrange(widths = c(3, 3, 1),p1 + theme(legend.position="none"),
-             p2 + theme(legend.position="none"), nrow= 1,legend)
+grid.arrange(widths = c(3, 3, 1),p15 + theme(legend.position="none"),
+             p16 + theme(legend.position="none"), nrow= 1,legend)
 
 ```
 
 
 ### age & race
 
-```{r, warning= F, fig.width= 10}
-p1 <- data %>%
+```{r, warning= F, fig.width= 10, echo = FALSE}
+p17 <- data %>%
   group_by(age, race_code) %>%
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
@@ -447,7 +456,7 @@ p1 <- data %>%
   ggtitle("Turnout rate vs. Age*Race") +
     theme(plot.title = element_text(hjust = 0.5))
 
-p2 <- data %>%
+p18 <- data %>%
   group_by(age, race_code) %>%
   summarize(n = sum(total_reg), .groups = "drop") %>%
   mutate(group = paste0(age, " with ", race_code)) %>%
@@ -459,15 +468,15 @@ p2 <- data %>%
   ggtitle("Sample Size vs. Age*Race") +
     theme(plot.title = element_text(hjust = 0.5))
 
-legend <- get_legend(p1)
+legend <- get_legend(p17)
 
-grid.arrange(widths = c(3, 3, 1),p1 + theme(legend.position="none"),
-             p2 + theme(legend.position="none"), nrow= 1,legend)
+grid.arrange(widths = c(3, 3, 1),p17 + theme(legend.position="none"),
+             p18 + theme(legend.position="none"), nrow= 1,legend)
 
 
 ```
 
-```{r}
+```{r echo = FALSE}
 data <- data %>%
   mutate(total_vot = as.numeric(total_vot), 
          total_reg = as.numeric(total_reg),
@@ -484,7 +493,7 @@ data <- data %>%
 # Model
 
 
-```{r, cache = T}
+```{r, cache = T, echo = FALSE}
 # initial
 mod1 <- glmer(cbind(total_vot, total_reg - total_vot) ~
                       party_cd  + sex_code + age + (1|county_desc),
@@ -526,7 +535,7 @@ mod6 <- glmer(cbind(cbind(total_vot, total_reg - total_vot)) ~
 ```
 
 
-```{r}
+```{r echo = FALSE}
 
 model <- c("Base model",
            "Add race",
@@ -549,11 +558,11 @@ data.frame("Model" = model, 'LRT p-value' = LRT, 'AIC' = AIC_score, 'BIC' = BIC_
 ```
 
 
-```{r}
+```{r echo = FALSE}
 summary(mod6)$coefficients
 ```
 
-```{r}
+```{r echo = FALSE}
 chart_fixef <- function(model) {
   summary(model)$coefficients %>%
     as.data.frame() %>%
@@ -569,7 +578,7 @@ chart_fixef <- function(model) {
 }
 ```
 
-```{r}
+```{r echo = FALSE}
 # expand data from aggregated format
 data_expand <- data %>%
   mutate(resp = map2(total_vot, total_reg, ~ c(
@@ -626,7 +635,7 @@ dotplot(ranef(mod6))$county_desc
 
 
 
-```{r}
+```{r echo = FALSE}
 # mod <- brm(
 #   data = data, family = binomial,
 #   total_vot | trials(total_reg) ~ 1 + party_cd + (1 | county_desc),
@@ -637,7 +646,7 @@ dotplot(ranef(mod6))$county_desc
 # )
 ```
 
-```{r}
+```{r echo = FALSE}
 # fixef(mod) %>%
 #   as.data.frame() %>%
 #   mutate(`95% CI` = paste0(
