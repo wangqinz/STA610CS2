@@ -12,8 +12,13 @@ fontsize: 11pt
 geometry: "left=1.5cm,right=1.5cm,top=1.25cm,bottom=1.75cm"
 ---
 
+## Introduction
+
+## Data cleaning
+
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = T, cache = T, message = F, warning =F)
+knitr::opts_chunk$set(echo = F, cache = T, message = F, warning =F)
 library(tidyverse)
 library(lme4)
 library(pROC)
@@ -558,8 +563,13 @@ data.frame("Model" = model, 'LRT p-value' = LRT, 'AIC' = AIC_score, 'BIC' = BIC_
 ```
 
 
+<<<<<<< HEAD
 ```{r echo = FALSE}
 summary(mod6)$coefficients
+=======
+```{r}
+# summary(mod6)$coefficients
+>>>>>>> a530a267c6f7c96a10d3b3fd8fc05765e82cfd01
 ```
 
 ```{r echo = FALSE}
@@ -634,7 +644,9 @@ dotplot(ranef(mod6))$county_desc
 ```
 
 
+## Interpretation
 
+<<<<<<< HEAD
 ```{r echo = FALSE}
 # mod <- brm(
 #   data = data, family = binomial,
@@ -671,6 +683,20 @@ dotplot(ranef(mod6))$county_desc
 #       y="County"
 #     ) +
 #     theme_bw()
+=======
+
+## Research Questions
+>>>>>>> a530a267c6f7c96a10d3b3fd8fc05765e82cfd01
+
+  - How did different demographic subgroups vote in the 2020 general elections? For example, how did the turnout for males compare to the turnout for females after controlling for other potential predictors?
 
 
-```
+  - Did the overall probability or odds of voting differ by county in 2020? Which counties differ the most from other counties?
+
+
+  - How did the turnout rates differ between females and males for the different party affiliations?
+
+
+  - How did the turnout rates differ between age groups for the different party affiliations?
+  
+  
