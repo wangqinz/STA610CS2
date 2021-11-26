@@ -12,11 +12,6 @@ fontsize: 11pt
 geometry: "left=1.5cm,right=1.5cm,top=1.25cm,bottom=1.75cm"
 ---
 
-## Introduction
-
-## Data cleaning
-
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = F, cache = T, message = F, warning =F)
 library(tidyverse)
@@ -144,13 +139,11 @@ data2 <- data %>%
 ## EDA
 
 
-```{r echo = FALSE}
+```{r echo = FALSE, include = FALSE}
 table(data2$vote_or_not)
 
 turnout_rate <- sum(data$total_vot) / sum(data$total_reg)
 data.frame(group = "Total", turnout_rate = turnout_rate)
-
-
 ```
 
 
@@ -181,7 +174,8 @@ p2 <- data %>%
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
   ggtitle("Sample size vs. County") +
     theme(plot.title = element_text(hjust = 0.5)) +
-  coord_flip()
+  ylim(0,3.15e5) +
+  coord_flip() 
 
  grid.arrange(p1,p2, nrow= 1)
 ```
@@ -189,7 +183,7 @@ p2 <- data %>%
 
 ### race
 
-```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE}
+```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE, include=FALSE}
 p3 <- data %>%
   group_by(race_code) %>%
   summarise(total_reg = sum(total_reg),
@@ -230,7 +224,7 @@ data <- data %>%
 
 ### party
 
-```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE}
+```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE, include=FALSE}
 p5 <- data %>%
   group_by(party_cd) %>%
   summarise(total_reg = sum(total_reg),
@@ -268,7 +262,7 @@ data$party_cd <- ifelse(data$party_cd %in% c("CST","GRE"),"CST_GRE",data$party_c
 
 ### ethnic groups
 
-```{r, warning= F, fig.width= 10, fig.height= 3, echo = FALSE}
+```{r, warning= F, fig.width= 10, fig.height= 3, echo = FALSE, include=FALSE}
 p7 <- data %>%
   group_by(ethnic_code) %>%
   summarise(total_reg = sum(total_reg),
@@ -303,7 +297,7 @@ grid.arrange(p7,p8, nrow= 1)
 
 ### Sex
 
-```{r, warning= F, fig.width= 10, fig.height= 3, echo = FALSE}
+```{r, warning= F, fig.width= 10, fig.height= 3, echo = FALSE, include=FALSE}
  p9 <- data %>%
   group_by(sex_code) %>%
   summarise(total_reg = sum(total_reg),
@@ -335,7 +329,7 @@ grid.arrange(p9,p10, nrow= 1)
 
 ### age
 
-```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE}
+```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE, include=FALSE}
 p11 <- data %>%
   group_by(age) %>%
   summarise(total_reg = sum(total_reg),
@@ -563,13 +557,8 @@ data.frame("Model" = model, 'LRT p-value' = LRT, 'AIC' = AIC_score, 'BIC' = BIC_
 ```
 
 
-<<<<<<< HEAD
 ```{r echo = FALSE}
-summary(mod6)$coefficients
-=======
-```{r}
-# summary(mod6)$coefficients
->>>>>>> a530a267c6f7c96a10d3b3fd8fc05765e82cfd01
+#summary(mod6)$coefficients 
 ```
 
 ```{r echo = FALSE}
@@ -646,47 +635,9 @@ dotplot(ranef(mod6))$county_desc
 
 ## Interpretation
 
-<<<<<<< HEAD
-```{r echo = FALSE}
-# mod <- brm(
-#   data = data, family = binomial,
-#   total_vot | trials(total_reg) ~ 1 + party_cd + (1 | county_desc),
-#   prior = c(prior(normal(0, 10), class = Intercept),
-#             prior(normal(0, 1), class = b)),
-#   iter = 2500, warmup = 500, cores = 4, chains = 2,
-#   seed = 10
-# )
-```
-
-```{r echo = FALSE}
-# fixef(mod) %>%
-#   as.data.frame() %>%
-#   mutate(`95% CI` = paste0(
-#     "[", round(Q2.5, 3), ",", round(Q97.5, 3), "]"
-#   )) %>%
-#   select(-c(Est.Error, Q2.5, Q97.5)) %>%
-#   kable(digits=3) %>%
-#   kable_classic() %>%
-#   kable_styling(full_width=FALSE)
-# 
-# ranef(mod)$county_desc %>%
-#   as.data.frame() %>%
-#   
-#   tibble::rownames_to_column(var="County") %>%
-#   ggplot(aes(y=reorder(County, Estimate.Intercept), x=Estimate.Intercept)) +
-#     geom_point(color="blue", size=2) +
-#     geom_linerange(aes(
-#       xmin=Q2.5.Intercept, xmax=Q97.5.Intercept
-#     )) +
-#     labs(
-#       x="Intercept",
-#       y="County"
-#     ) +
-#     theme_bw()
-=======
 
 ## Research Questions
->>>>>>> a530a267c6f7c96a10d3b3fd8fc05765e82cfd01
+
 
   - How did different demographic subgroups vote in the 2020 general elections? For example, how did the turnout for males compare to the turnout for females after controlling for other potential predictors?
 
