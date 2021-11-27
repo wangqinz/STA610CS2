@@ -29,7 +29,7 @@ library(cowplot)
 
 # Introduction
 
-Voter turnout by a number of different demographics such as age, race and party is a huge topic of interest for both pollsters and candidates, especially around presidential elections and with particular focus on swing states, such as North Caroline. In this case study we will use North Carolina registration and turnout data, by county, for the 2020 election year. We wish to investigate what demographic factors affect turnout and whether turnout differs by county. 
+Voter turnout is a huge topic of interest for both pollsters and candidates, especially around presidential elections and with particular focus on swing states, such as North Carolina. In this case study we will use North Carolina registration and turnout data, by county, for the 2020 election year. We wish to investigate what demographic factors such as age, race, and party affect turnout and whether turnout differs by county. 
 
 ```{r echo = FALSE}
 # Explanation of abbreviations: https://s3.amazonaws.com/dl.ncsbe.gov/data/layout_ncvoter.txt
@@ -68,7 +68,7 @@ registers <- registers %>%
 
 ## Data Cleaning
 
-Note that we renamed the history stats 2020-11-03 data as votes and the voterstats 2020-11-03 data as registers. Within the votes and registers data we aggregated the total voters variable by taking the sum, ignoring NA values, and then left joined votes to registers. We next replaced any NA values in total votes with 0. While these values are unlikely to be exactly 0, we chose to do this in order to preserve the information that was present as the alternative would be to throw the entire row away. After this we dropped all of the rows containing NA values in any of the other columns. Since total voters is one of the main variables we care about it made sense to preserve as many rows as possible but if we replaced every NA value in the data with 0 that may potentially introduce a lot of error into the data, as the values are unlikely to be exactly 0, so we instead dropped all of the rows containing NA values, leaving us with 51,883 rows. We next randomly sampled 30 counties to utilize in our analysis, leaving our finall data with 16,439 rows and, after deaggregation, 1,908,907 individuals. 
+Note that we renamed the history stats 2020-11-03 data as votes and the voterstats 2020-11-03 data as registers. Within the votes and registers data we aggregated the total voters variable by taking the sum, ignoring NA values, and then left joined votes to registers. We next replaced any NA values in total votes with 0. While these values are unlikely to be exactly 0, we chose to do this in order to preserve the information that was present as the alternative would be to throw the entire row away. After this we dropped all of the rows containing NA values in any of the other columns. Since total voters is one of the main variables we care about it made sense to preserve as many rows as possible but if we replaced every NA value in the data with 0 that may potentially introduce a lot of error into the data, as the values are unlikely to be exactly 0, so we instead dropped all of the rows containing NA values, leaving us with 51,883 rows. We next randomly sampled 30 counties to utilize in our analysis, leaving our final data with 16,439 rows and, after deaggregation, 1,908,907 individuals. 
 
 ```{r echo = FALSE}
 votes <- votes %>%
@@ -138,6 +138,7 @@ data2 <- data %>%
 
 ## EDA
 
+Below we see that most counties have a turnout rate over 70% with the average of all counties being 73%. The lowest turnout rate of 61% is from Robeson county. We also see that two counties, Forsyth and Cabarrus, have much larger sample sizes than the other sampled counties. When looking at race, age, gender, ethnicity, and party individually (plots in appendix) we found that white people had the highest turnout and sample size while multiracial people had the lowest turnout rate, along with people of race 'other', and the smallest sample size. The Republican party had the highest turnout while the Libertarian party had the lowest turnout. Both the Green party and the Constitution party had the lowest sample sizes, less than 1500 each, so we combined these categories to provide our model with computational stability. When looking at ethnicities, people of Hispanic/Latinx ethnicity had both the lowest sample size and turnout, a 20 point difference compared to people who weren't of Hispanic/Latinx ethnicity. Turnout rate varied very little by gender although people of unknown gender had the smallest sample size. Looking at age we see that the age group of people 18-25 had both the lowest sample size and turnout rate, a difference of 27 points when compared to those 66 and older. However, the age group of people 41-65 had the largest sample size, nearly triple the sample size of the 18-25 age group.
 
 ```{r echo = FALSE, include = FALSE}
 table(data2$vote_or_not)
@@ -153,9 +154,10 @@ data.frame(group = "Total", turnout_rate = turnout_rate)
 p1 <- data %>%
   group_by(county_desc) %>%
   summarise(total_reg = sum(total_reg),
-            total_vot = sum(total_vot), .groups = "drop") %>%
+            total_vot = sum(total_vot), .groups = "drop",
+            n = sum(total_reg)) %>%
   mutate(turnout_rate = total_vot / total_reg) %>%
-  ggplot( aes(x = county_desc, y = turnout_rate)) +
+  ggplot( aes(x = fct_reorder(county_desc,n), y = turnout_rate)) +
   geom_bar(stat = "identity") +
   ylim(0,1) +
   xlab("County") + ylab("Turnout rate") +
@@ -168,7 +170,7 @@ p1 <- data %>%
 p2 <- data %>%
   group_by(county_desc) %>%
   summarize(n = sum(total_reg), .groups="drop") %>%
-  ggplot( aes(x = county_desc, y = n)) +
+  ggplot( aes(x = fct_reorder(county_desc,n), y = n)) +
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
@@ -181,7 +183,7 @@ p2 <- data %>%
 ```
 
 
-### race
+
 
 ```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE, include=FALSE}
 p3 <- data %>%
@@ -222,7 +224,7 @@ data <- data %>%
 
 
 
-### party
+
 
 ```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE, include=FALSE}
 p5 <- data %>%
@@ -260,7 +262,7 @@ data$party_cd <- ifelse(data$party_cd %in% c("CST","GRE"),"CST_GRE",data$party_c
 
 ```
 
-### ethnic groups
+
 
 ```{r, warning= F, fig.width= 10, fig.height= 3, echo = FALSE, include=FALSE}
 p7 <- data %>%
@@ -295,7 +297,7 @@ grid.arrange(p7,p8, nrow= 1)
 
 
 
-### Sex
+
 
 ```{r, warning= F, fig.width= 10, fig.height= 3, echo = FALSE, include=FALSE}
  p9 <- data %>%
@@ -327,7 +329,7 @@ p10 <- data %>%
 grid.arrange(p9,p10, nrow= 1)
 ```
 
-### age
+
 
 ```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE, include=FALSE}
 p11 <- data %>%
@@ -354,6 +356,7 @@ p12 <- data %>%
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
   ggtitle("Sample size vs. Age") +
     theme(plot.title = element_text(hjust = 0.5)) +
+  ylim(0,8.8e05) +
   coord_flip()
 
 grid.arrange(p11,p12, nrow= 1)
