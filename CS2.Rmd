@@ -138,7 +138,7 @@ data2 <- data %>%
 
 ## EDA
 
-Below we see that most counties have a turnout rate over 70% with the average of all counties being 73%. The lowest turnout rate of 61% is from Robeson county. We also see that two counties, Forsyth and Cabarrus, have much larger sample sizes than the other sampled counties. When looking at race, age, gender, ethnicity, and party individually (plots in appendix) we found that white people had the highest turnout and sample size while multiracial people had the lowest turnout rate, along with people of race 'other', and the smallest sample size. The Republican party had the highest turnout while the Libertarian party had the lowest turnout. Both the Green party and the Constitution party had the lowest sample sizes, less than 1500 each, so we combined these categories to provide our model with computational stability. When looking at ethnicities, people of Hispanic/Latinx ethnicity had both the lowest sample size and turnout, a 20 point difference compared to people who weren't of Hispanic/Latinx ethnicity. Turnout rate varied very little by gender although people of unknown gender had the smallest sample size. Looking at age we see that the age group of people 18-25 had both the lowest sample size and turnout rate, a difference of 27 points when compared to those 66 and older. However, the age group of people 41-65 had the largest sample size, nearly triple the sample size of the 18-25 age group.
+Below we see that most counties have a turnout rate over 70% with the average of all counties being 73%. The lowest turnout rate of 61% is from Robeson county. We also see that two counties, Forsyth and Cabarrus, have many more registered voters than the other sampled counties. When looking at race, age, gender, ethnicity, and party individually (plots in appendix) we found that white people had the highest turnout and number of voters registered while multiracial people had the lowest turnout rate, along with people of race 'other', and the smallest number of voters registered. The Republican party had the highest turnout while the Libertarian party had the lowest turnout. Both the Green party and the Constitution party had the lowest number of voters registered, less than 1500 each, so we combined these categories to provide our model with computational stability. When looking at ethnicities, people of Hispanic/Latinx ethnicity had both the lowest number of voters registered and turnout, a 20 point difference compared to people who weren't of Hispanic/Latinx ethnicity. Turnout rate varied very little by gender although people of unknown gender had the smallest number of voters registered. Looking at age we see that the age group of people 18-25 had both the lowest number of voters registered and turnout rate, a difference of 27 points when compared to those 66 and older. However, the age group of people 41-65 had the largest number of voters registered, nearly triple that of the 18-25 age group.
 
 ```{r echo = FALSE, include = FALSE}
 table(data2$vote_or_not)
@@ -174,7 +174,7 @@ p2 <- data %>%
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
-  ggtitle("Sample size vs. County") +
+  ggtitle("Registered Voters by County") +
     theme(plot.title = element_text(hjust = 0.5)) +
   ylim(0,3.15e5) +
   coord_flip() 
@@ -210,7 +210,7 @@ p4 <- data %>%
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
-  ggtitle("Sample size vs. Race") +
+  ggtitle("Registered Voters vs. Race") +
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
@@ -249,7 +249,7 @@ p6 <- data %>%
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
-  ggtitle("Sample size vs. Party") +
+  ggtitle("Registered Voters vs. Party") +
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
@@ -257,7 +257,7 @@ grid.arrange(p5,p6, nrow= 1)
 
 
 # "CST","GRE" have small smaple size (50,25) and similar turnout rate (0.16,0.15)
-data$party_cd <- ifelse(data$party_cd %in% c("CST","GRE"),"CST_GRE",data$party_cd)
+data$party_cd <- ifelse(data$party_cd %in% c("CST","GRE"),"CST_GRE",as.character(data$party_cd))
 
 
 ```
@@ -287,7 +287,7 @@ p8 <- data %>%
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
-  ggtitle("Sample size vs. Ethnic") +
+  ggtitle("Registered Voters vs. Ethnic") +
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
@@ -322,7 +322,7 @@ p10 <- data %>%
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
-  ggtitle("Sample size vs. Sex") +
+  ggtitle("Registered Voters vs. Sex") +
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
 
@@ -354,7 +354,7 @@ p12 <- data %>%
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
-  ggtitle("Sample size vs. Age") +
+  ggtitle("Registered Voters vs. Age") +
     theme(plot.title = element_text(hjust = 0.5)) +
   ylim(0,8.8e05) +
   coord_flip()
@@ -363,7 +363,9 @@ grid.arrange(p11,p12, nrow= 1)
 
 ```
 
-### sex & party
+### Gender & Party
+
+Next we move on to EDA related to interactions. We're interested in any potential differences in turnout rate for females and males with various party affiliations. In the graph below we see that females have higher turnout rates than males for each party. People with unknown genders, however, often have the highest turnout rate. For parties with substantial turnout rates, the Republican and Democrat parties, as well as those unaffiliated with a party, females had a larger number of voters registered than males and people with unknown genders had a much smaller number of voters registered. Note that, even after combining the Green and Constitutional parties, the number of registered voters for these parties is still quite small, relative to the other parties.
 
 ```{r, warning= F, fig.width= 10, echo = FALSE}
 p13 <- data %>%
@@ -373,7 +375,7 @@ p13 <- data %>%
   mutate(turnout_rate = total_vot / total_reg,
          group = paste0(sex_code, " with ", party_cd)) %>%
   select(group = group, turnout_rate, sex_code, party_cd) %>%
-  ggplot( aes(x = group, y = turnout_rate, fill = sex_code)) +
+  ggplot( aes(x = group, y = turnout_rate, fill = party_cd)) +
   geom_bar(stat = "identity") +
   ylim(0,1) +
   xlab("Sex * Party") + ylab("Turnout rate") +
@@ -386,12 +388,12 @@ p14 <- data %>%
   group_by(sex_code, party_cd) %>%
   summarize(n = sum(total_reg), .groups = "drop") %>%
   mutate(group = paste0(sex_code, " with ", party_cd)) %>%
-  ggplot( aes(x = group, y = n, fill = sex_code)) +
+  ggplot( aes(x = group, y = n, fill = party_cd)) +
   geom_bar(stat = "identity") +
   xlab("Age * Party") + ylab("Size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.3) +
   coord_flip() +
-  ggtitle("Sample Size vs. Age*Party") +
+  ggtitle("Registered Voters vs. Age*Party") +
     theme(plot.title = element_text(hjust = 0.5))
 
 legend <- get_legend(p13)
@@ -400,7 +402,9 @@ grid.arrange(widths = c(3, 3, 1),p13 + theme(legend.position="none"),
              p14 + theme(legend.position="none"), nrow= 1,legend)
 ```
 
-###  age & party
+###  Age & Party
+
+We are also interested in the potential difference between age groups in various political parties. From the graphs below we see that the age group of 66 and older has the highest turnout rate for every political party and the age group 18-25 has the lowest. In general, it seems that, across parties, as age increases, turnout rate also increases. As noted previously, the age group 41-65 has the largest number of registered voters for both of the main parties, Republican and Democrat, and for unaffiliated voters.
 
 ```{r, warning= F, fig.width= 10, echo = FALSE}
 p15 <- data %>%
@@ -410,7 +414,7 @@ p15 <- data %>%
   mutate(turnout_rate = total_vot / total_reg,
          group = paste0(age, " with ", party_cd)) %>%
   select(group = group, turnout_rate, age, party_cd) %>%
-  ggplot( aes(x = group, y = turnout_rate, fill = age)) +
+  ggplot( aes(x = group, y = turnout_rate, fill = party_cd)) +
   geom_bar(stat = "identity") +
   ylim(0,1) +
   xlab("Age * Party") + ylab("Turnout rate") +
@@ -423,12 +427,12 @@ p16 <- data %>%
   group_by(age, party_cd) %>%
   summarize(n = sum(total_reg), .groups = "drop") %>%
   mutate(group = paste0(age, " with ", party_cd)) %>%
-  ggplot( aes(x = group, y = n, fill = age)) +
+  ggplot( aes(x = group, y = n, fill = party_cd)) +
   geom_bar(stat = "identity") +
   xlab("Age * Party") + ylab("Size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.3) +
   coord_flip() +
-  ggtitle("Sample Size vs. Age*Party") +
+  ggtitle("Registered Voters vs. Age*Party") +
     theme(plot.title = element_text(hjust = 0.5))
 
 legend <- get_legend(p15)
@@ -439,7 +443,9 @@ grid.arrange(widths = c(3, 3, 1),p15 + theme(legend.position="none"),
 ```
 
 
-### age & race
+### Age & Race
+
+We are also interested in a potential relationship between age and race. In the graphs below we see a general trend that, across races, as the age increase so too does the turnout rate. We also see that, within each age group, white people make up the majority of registered voters.
 
 ```{r, warning= F, fig.width= 10, echo = FALSE}
 p17 <- data %>%
@@ -449,7 +455,7 @@ p17 <- data %>%
   mutate(turnout_rate = total_vot / total_reg,
          group = paste0(age, " with ", race_code)) %>%
   select(group = group, turnout_rate, age, race_code) %>%
-  ggplot( aes(x = group, y = turnout_rate, fill = age)) +
+  ggplot( aes(x = group, y = turnout_rate, fill = race_code)) +
   geom_bar(stat = "identity") +
   ylim(0,1) +
   xlab("Age * Race") + ylab("Turnout rate") +
@@ -462,12 +468,12 @@ p18 <- data %>%
   group_by(age, race_code) %>%
   summarize(n = sum(total_reg), .groups = "drop") %>%
   mutate(group = paste0(age, " with ", race_code)) %>%
-  ggplot( aes(x = group, y = n, fill = age)) +
+  ggplot( aes(x = group, y = n, fill = race_code)) +
   geom_bar(stat = "identity") +
   xlab("Age * Party") + ylab("Size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.3) +
   coord_flip() +
-  ggtitle("Sample Size vs. Age*Race") +
+  ggtitle("Registered Voters vs. Age*Race") +
     theme(plot.title = element_text(hjust = 0.5))
 
 legend <- get_legend(p17)
@@ -494,6 +500,7 @@ data <- data %>%
 
 # Model
 
+With our exploration of the data complete, we now begin our model building. From the research questions we have an idea of what must be included in the model; this includes main effect for party, sex, and age, as well as random intercepts by county. This will be our base model. From the research questions we also know that we likely need an interaction term between age and party as well as sex and party. Below we see the output from forward selection. We see that the last model, with interactions between sex and party, age and party, as well as age and race, has the lowest BIC and AIC so this will be our final model.
 
 ```{r, cache = T, echo = FALSE}
 # initial
