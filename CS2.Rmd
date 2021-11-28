@@ -613,17 +613,16 @@ data.frame("Model" = model, 'LRT p-value' = LRT, 'AIC' = AIC_score, 'BIC' = BIC_
 
 ```{r echo = FALSE}
 chart_fixef <- function(model) {
-  summary(model)$coefficients %>%
+ summary(model)$coefficients %>%
     as.data.frame() %>%
     mutate(`95% CI` = paste0(
       '[', 
       round(Estimate - 1.96 * `Std. Error`, 3), ', ', 
       round(Estimate + 1.96 * `Std. Error`, 3), ']' )
     ) %>%
-    select(Estimate, `95% CI`) %>%
-    kable(digits=3) %>%
-    kable_styling(full_width=FALSE) %>%
-    kable_classic()
+    select(Estimate, `95% CI`)
+  
+
 }
 ```
 
@@ -665,13 +664,18 @@ ggroc(rocobj, size=1) +
   theme_bw()
 # fit model on full data
 
-mod6 <- glmer(cbind(total_vot, total_reg - total_vot) ~
-                1 + party_cd + sex_code:party_cd + (1|county_desc),
-              data = data, family = binomial,
-              control=glmerControl(optimizer = "bobyqa"))
-
 # Fixed Effects
-chart_fixef(mod6)
+temp <- chart_fixef(mod6)
+
+  temp[1:50,] %>%
+    kable(digits=3) %>%
+    kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+    kable_classic()
+  
+  temp[51:56,] %>%
+    kable(digits=3) %>%
+    kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+    kable_classic()
 
 # Uncomment below to show values for random effects in appendix
 
@@ -701,7 +705,13 @@ dotplot(ranef(mod6))$county_desc
 
 ## Interpretation
 
-Our baseline is that of a female aligned with party ?? of mixed race and hispanic/latina ethnicity, in the age category 18-25. The odds of this person voting is .
+Due to the large number of coefficients, we will only interpret a few for demonstration.
+
+Our baseline is that of a female aligned with party ??, of mixed race and Hispanic/Latina ethnicity, in the age category 18-25. The odds of this person voting is .
+
+Holding all else constant, a male aligned with party ??, of mixed race and Hispanic/Latino ethnicity, in the age category 18-25 has exp() times the odds of the baseline of voting.
+
+
 
 
 ## Research Questions
