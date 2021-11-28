@@ -502,6 +502,28 @@ data <- data %>%
 
 With our exploration of the data complete, we now begin our model building. From the research questions we have an idea of what must be included in the model; this includes main effect for party, sex, and age, as well as random intercepts by county. This will be our base model. From the research questions we also know that we likely need an interaction term between age and party as well as sex and party. Below we see the output from forward selection. We see that the last model, with interactions between sex and party, age and party, as well as age and race, has the lowest BIC and AIC so this will be our final model.
 
+$$
+\begin{aligned}
+log\left(\frac{\pi_{ij}}{1-\pi_{ij}}\right)&=\beta_0+\sum_k\beta_{1k}\mathbb{1}[P_{ij}=k]+\sum_k\beta_{2k}\mathbb{1}[R_{ij}=k]+\sum_k\beta_{3k}\mathbb{1}[E_{ij}=k]+\sum_k\beta_{4k}\mathbb{1}[S_{ij}=k]+\sum_k\beta_{5k}\mathbb{1}[A_{ij}=k]\\
+&+\sum_{k,l}\beta_{6k}\mathbb{1}[S_{ij}=k]\mathbb{1}[P_{ij}=k]+\sum_{k,l}\beta_{7k}\mathbb{1}[A_{ij}=k]\mathbb{1}[P_{ij}=k]+\sum_{k,l}\beta_{8k}\mathbb{1}[A_{ij}=k]\mathbb{1}[R_{ij}=k] +b_{0j}
+\end{aligned}
+$$
+where $\pi_{ij}=Pr(y_{ij}=1)$ and $b_{0j}\overset{\text{iid}}{\sim} N(0,\sigma^2)$ and
+
+* $j$ indexes county
+
+* $i$ indexes observation
+
+* $P_{ij}$ is the Party code
+
+* $R_{ij}$ is the Race code
+
+* $E_{ij}$ is the Ethnic code
+
+* $S_{ij}$ is the sex code
+
+* $A_{ij}$ is the Age group
+
 ```{r, cache = T, echo = FALSE}
 # initial
 mod1 <- glmer(cbind(total_vot, total_reg - total_vot) ~
