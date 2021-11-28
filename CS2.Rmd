@@ -500,12 +500,13 @@ data <- data %>%
 
 # Model
 
-With our exploration of the data complete, we now begin our model building. From the research questions we have an idea of what must be included in the model; this includes main effect for party, sex, and age, as well as random intercepts by county. This will be our base model. From the research questions we also know that we likely need an interaction term between age and party as well as sex and party. Below we see the output from forward selection. We see that the last model, with interactions between sex and party, age and party, as well as age and race, has the lowest BIC and AIC so this will be our final model.
+With our exploration of the data complete, we now begin our model building. From the research questions we have an idea of what must be included in the model; this includes main effect for party, sex, and age, as well as random intercepts by county. This will be our base model. From the research questions we also know that we likely need an interaction term between age and party as well as sex and party. Additionally, since our dependent variable, turnout rate, is between 0 and 1, we know we should use a logistic mixed effects model. Below we see the output from forward selection. We see that the last model, with interactions between sex and party, age and party, as well as age and race, has the lowest BIC and AIC so this will be our final model.
 
 $$
 \begin{aligned}
-log\left(\frac{\pi_{ij}}{1-\pi_{ij}}\right)&=\beta_0+\sum_k\beta_{1k}\mathbb{1}[P_{ij}=k]+\sum_k\beta_{2k}\mathbb{1}[R_{ij}=k]+\sum_k\beta_{3k}\mathbb{1}[E_{ij}=k]+\sum_k\beta_{4k}\mathbb{1}[S_{ij}=k]+\sum_k\beta_{5k}\mathbb{1}[A_{ij}=k]\\
-&+\sum_{k,l}\beta_{6k}\mathbb{1}[S_{ij}=k]\mathbb{1}[P_{ij}=k]+\sum_{k,l}\beta_{7k}\mathbb{1}[A_{ij}=k]\mathbb{1}[P_{ij}=k]+\sum_{k,l}\beta_{8k}\mathbb{1}[A_{ij}=k]\mathbb{1}[R_{ij}=k] +b_{0j}
+log\left(\frac{\pi_{ij}}{1-\pi_{ij}}\right)&=\beta_0+\sum_k\beta_{1k}\mathbb{1}[P_{ij}=k]+\sum_k\beta_{2k}\mathbb{1}[R_{ij}=k]+\sum_k\beta_{3k}\mathbb{1}[E_{ij}=k]+\sum_k\beta_{4k}\mathbb{1}[S_{ij}=k]\\
+&+\sum_k\beta_{5k}\mathbb{1}[A_{ij}=k]+\sum_{k,l}\beta_{6k}\mathbb{1}[S_{ij}=k]\mathbb{1}[P_{ij}=k]+\sum_{k,l}\beta_{7k}\mathbb{1}[A_{ij}=k]\mathbb{1}[P_{ij}=k]\\
+&+\sum_{k,l}\beta_{8k}\mathbb{1}[A_{ij}=k]\mathbb{1}[R_{ij}=k] +b_{0j}
 \end{aligned}
 $$
 where $\pi_{ij}=Pr(y_{ij}=1)$ and $b_{0j}\overset{\text{iid}}{\sim} N(0,\sigma^2)$ and
@@ -589,8 +590,25 @@ data.frame("Model" = model, 'LRT p-value' = LRT, 'AIC' = AIC_score, 'BIC' = BIC_
 ```
 
 
-```{r echo = FALSE}
+```{r echo = FALSE, cache = TRUE}
 #summary(mod6)$coefficients 
+# 
+# summary <- summary(mod6)
+# mod6.coefs <- exp(coef(summary))
+# 
+# labs.df <- as.data.frame(ranef(mod6))
+# labs.df <- labs.df %>% 
+#   mutate(Lower = condval - 2*condsd) %>%
+#   mutate(Upper = condval + 2*condsd) %>%
+#   mutate(Estimate = exp(condval)) %>%
+#   mutate(SD = exp(condsd)) %>% 
+#   mutate(lower = Estimate - 2*SD) %>%
+#   mutate(upper = Estimate + 2*SD)
+#   
+# labs.df <- labs.df[, 3:11]
+# colnames(labs.df) <- c("County", "Estimate", "SD","Lower", "Upper", "E.Estimate", "E.SD", "E.Lower", "E.Upper")
+# 
+# kable(list(mod6.coefs, labs.df[,c(1, 6,8:9)]), digits = 3)
 ```
 
 ```{r echo = FALSE}
@@ -655,6 +673,22 @@ mod6 <- glmer(cbind(total_vot, total_reg - total_vot) ~
 # Fixed Effects
 chart_fixef(mod6)
 
+# Uncomment below to show values for random effects in appendix
+
+# labs.df <- as.data.frame(ranef(mod6))
+# labs.df <- labs.df %>% 
+#   mutate(Lower = condval - 2*condsd) %>%
+#   mutate(Upper = condval + 2*condsd) %>%
+#   mutate(Estimate = exp(condval)) %>%
+#   mutate(SD = exp(condsd)) %>% 
+#   mutate(lower = Estimate - 2*SD) %>%
+#   mutate(upper = Estimate + 2*SD)
+#   
+# labs.df <- labs.df[, 3:11]
+# colnames(labs.df) <- c("County", "Estimate", "SD","Lower", "Upper", "E.Estimate", "E.SD", "E.Lower", "E.Upper")
+# 
+# kable(labs.df[,c(1, 6,8:9)], digits = 3)
+
 
 # Random Effects
 dotplot(ranef(mod6))$county_desc
@@ -666,6 +700,8 @@ dotplot(ranef(mod6))$county_desc
 
 
 ## Interpretation
+
+Our baseline is that of a female aligned with party ?? of mixed race and hispanic/latina ethnicity, in the age category 18-25. The odds of this person voting is .
 
 
 ## Research Questions
