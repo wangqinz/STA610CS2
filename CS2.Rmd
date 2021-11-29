@@ -26,6 +26,7 @@ library(dplyr)
 library(gridExtra)
 library(cowplot)
 library(arm)
+
 ```
 
 # Introduction
@@ -55,9 +56,9 @@ votes[votes == " "] <- NA
 # remove above three columns
 
 registers <- registers %>%
-  select(-election_date, -stats_type, -update_date)
+  dplyr::select(-election_date, -stats_type, -update_date)
 votes <- votes %>%
-  select(-election_date, -stats_type, -update_date)
+  dplyr::select(-election_date, -stats_type, -update_date)
 
 votes <- votes %>%
   mutate(total_voters = as.numeric(total_voters))
@@ -132,7 +133,7 @@ data2 <- data %>%
   mutate(vote_or_not = ifelse(vote_or_not == "total_vot", 1, 0)) %>%
   mutate(row_expand = map(prob, ~rep_len(1, .x))) %>%
   unnest(cols = c(row_expand)) %>%
-  select(-prob, -row_expand)
+  dplyr::select(-prob, -row_expand)
 
 # 1,908,907 individuals
 ```
@@ -192,7 +193,7 @@ p3 <- data %>%
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg) %>%
-  select(group = race_code, turnout_rate) %>%
+  dplyr::select(group = race_code, turnout_rate) %>%
   ggplot( aes(x = group, y = turnout_rate)) +
   geom_bar(stat = "identity") +
   ylim(0,1) +
@@ -233,7 +234,7 @@ p5 <- data %>%
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg) %>%
-  select(group = party_cd, turnout_rate) %>%
+  dplyr::select(group = party_cd, turnout_rate) %>%
   ggplot( aes(x = group, y = turnout_rate)) +
   geom_bar(stat = "identity") +
   ylim(0,1) +
@@ -271,7 +272,7 @@ p7 <- data %>%
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg) %>%
-  select(group = ethnic_code, turnout_rate) %>%
+  dplyr::select(group = ethnic_code, turnout_rate) %>%
   ggplot( aes(x = group, y = turnout_rate)) +
   geom_bar(stat = "identity") +
   ylim(0,1) +
@@ -306,7 +307,7 @@ grid.arrange(p7,p8, nrow= 1)
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg) %>%
-  select(group = sex_code, turnout_rate) %>%
+  dplyr::select(group = sex_code, turnout_rate) %>%
   ggplot( aes(x = group, y = turnout_rate)) +
   geom_bar(stat = "identity") +
   ylim(0,1) +
@@ -338,7 +339,7 @@ p11 <- data %>%
   summarise(total_reg = sum(total_reg),
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg) %>%
-  select(group = age, turnout_rate) %>%
+  dplyr::select(group = age, turnout_rate) %>%
   ggplot( aes(x = group, y = turnout_rate)) +
   geom_bar(stat = "identity") +
   ylim(0,1) +
@@ -375,7 +376,7 @@ p13 <- data %>%
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg,
          group = paste0(sex_code, " with ", party_cd)) %>%
-  select(group = group, turnout_rate, sex_code, party_cd) %>%
+  dplyr::select(group = group, turnout_rate, sex_code, party_cd) %>%
   ggplot( aes(x = group, y = turnout_rate, fill = party_cd)) +
   geom_bar(stat = "identity") +
   ylim(0,1) +
@@ -414,7 +415,7 @@ p15 <- data %>%
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg,
          group = paste0(age, " with ", party_cd)) %>%
-  select(group = group, turnout_rate, age, party_cd) %>%
+  dplyr::select(group = group, turnout_rate, age, party_cd) %>%
   ggplot( aes(x = group, y = turnout_rate, fill = party_cd)) +
   geom_bar(stat = "identity") +
   ylim(0,1) +
@@ -455,7 +456,7 @@ p17 <- data %>%
             total_vot = sum(total_vot), .groups = "drop") %>%
   mutate(turnout_rate = total_vot / total_reg,
          group = paste0(age, " with ", race_code)) %>%
-  select(group = group, turnout_rate, age, race_code) %>%
+  dplyr::select(group = group, turnout_rate, age, race_code) %>%
   ggplot( aes(x = group, y = turnout_rate, fill = race_code)) +
   geom_bar(stat = "identity") +
   ylim(0,1) +
@@ -621,7 +622,7 @@ chart_fixef <- function(model) {
       round(Estimate - 1.96 * `Std. Error`, 3), ', ', 
       round(Estimate + 1.96 * `Std. Error`, 3), ']' )
     ) %>%
-    select(Estimate, `95% CI`)
+    dplyr::select(Estimate, `95% CI`)
   
 
 }
@@ -640,7 +641,7 @@ data_expand <- data %>%
     rep(1, .x), rep(0, .y - .x)
   ))) %>%
   unnest(cols = c(resp)) %>%
-  select(-c(total_reg, total_vot))
+  dplyr::select(-c(total_reg, total_vot))
 
 # split into train and test
 sample <- sample(c(TRUE, FALSE), nrow(data_expand), replace=TRUE, prob=c(0.7,0.3))
