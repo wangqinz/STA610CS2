@@ -13,7 +13,7 @@ geometry: "left=1.5cm,right=1.5cm,top=1.25cm,bottom=1.75cm"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(cache = T, message = F, warning =F)
+knitr::opts_chunk$set(cache = F, message = F, warning =F)
 library(tidyverse)
 library(lme4)
 library(pROC)
@@ -591,38 +591,18 @@ data.frame("Model" = model, 'LRT p-value' = LRT, 'AIC' = AIC_score, 'BIC' = BIC_
 
 ```
 
-
-```{r, echo = FALSE, cache = TRUE}
-#summary(mod6)$coefficients 
-# 
-# summary <- summary(mod6)
-# mod6.coefs <- exp(coef(summary))
-# 
-# labs.df <- as.data.frame(ranef(mod6))
-# labs.df <- labs.df %>% 
-#   mutate(Lower = condval - 2*condsd) %>%
-#   mutate(Upper = condval + 2*condsd) %>%
-#   mutate(Estimate = exp(condval)) %>%
-#   mutate(SD = exp(condsd)) %>% 
-#   mutate(lower = Estimate - 2*SD) %>%
-#   mutate(upper = Estimate + 2*SD)
-#   
-# labs.df <- labs.df[, 3:11]
-# colnames(labs.df) <- c("County", "Estimate", "SD","Lower", "Upper", "E.Estimate", "E.SD", "E.Lower", "E.Upper")
-# 
-# kable(list(mod6.coefs, labs.df[,c(1, 6,8:9)]), digits = 3)
-```
-
 ```{r, echo = FALSE}
 chart_fixef <- function(model) {
  summary(model)$coefficients %>%
     as.data.frame() %>%
-    mutate(`95% CI` = paste0(
-      '[', 
-      round(Estimate - 1.96 * `Std. Error`, 4), ', ', 
-      round(Estimate + 1.96 * `Std. Error`, 4), ']' )
-    ) %>%
-    dplyr::select(Estimate, `Std. Error`, `95% CI`)
+    mutate(`lower bound` = round(Estimate - 1.96 * `Std. Error`, 4),
+           `upper bound` = round(Estimate + 1.96 * `Std. Error`, 4)) %>%
+    # mutate(`95% CI` = paste0(
+    #   '[', 
+    #   round(Estimate - 1.96 * `Std. Error`, 4), ', ', 
+    #   round(Estimate + 1.96 * `Std. Error`, 4), ']' )
+    # ) %>%
+    dplyr::select(Estimate, `Std. Error`, `95% lower`, `95% upper`)
 }
 ```
 
@@ -655,6 +635,8 @@ test <- data_expand[!sample,]
 
 predicted <- predict(mod6, test, type="response")
 rocobj <- roc(test$resp, predicted)
+
+
 ggroc(rocobj, size=1) +
   coord_fixed() +
   scale_x_reverse(
@@ -722,12 +704,12 @@ Now, we can answer the research questions based on the model results.
 Notice that our final model incorporated the interaction terms `sex:party` and `age:party`, we should interpret the effects of party at the baseline levels of the other two terms (female and age 18-25).
 
 ```{r, echo = FALSE}
-chart_fixef(mod6)[2:5,] %>%
-  as.data.frame() %>%
+data.frame(chart_fixef(mod6)[2:5,]) %>%
   kable(caption = "Estiamtes and 95% CI of Fixed Effects for Party",
         digits=4) %>%
   kable_styling(latex_options = c("HOLD_position","striped"))
 ```
+
 
 Holding all other predictors unchanged:
 
@@ -740,7 +722,6 @@ an 18-25 year old female REP voter has $e^{0.3248} = 1.3838$ times (a 38% increa
 an 18-25 year old female UNA voter has $e^{-0.1791} = 0.8360$ times (a 17% decrease) the odds of voting (this effect is not significant since the 95% CI covers 0)
 
 compared with an 18-25 year old female GRE/CST voter.
-
 
 ### Race
 
