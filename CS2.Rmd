@@ -70,7 +70,7 @@ registers <- registers %>%
 
 ## Data Cleaning
 
-Note that we renamed the history stats 2020-11-03 data as votes and the voterstats 2020-11-03 data as registers. Within the votes and registers data we aggregated the total voters variable by taking the sum, ignoring NA values, and then left joined votes to registers. We next replaced any NA values in total votes with 0. While these values are unlikely to be exactly 0, we chose to do this in order to preserve the information that was present as the alternative would be to throw the entire row away. After this we dropped all of the rows containing NA values in any of the other columns. Since total voters is one of the main variables we care about it made sense to preserve as many rows as possible but if we replaced every NA value in the data with 0 that may potentially introduce a lot of error into the data, as the values are unlikely to be exactly 0, so we instead dropped all of the rows containing NA values, leaving us with 51,883 rows. We next randomly sampled 30 counties to utilize in our analysis, leaving our final data with 16,439 rows and, after deaggregation, 1,908,907 individuals. 
+Note that we renamed the `history_stats_20201103` data as votes and the `voter_stats_20201103` data as registers. Within the votes and registers data we aggregated the total voters variable by taking the sum, ignoring NA values, and then left joined votes to registers on county and all the demographic features. We next replaced any NA values in total votes with 0. While these values are unlikely to be exactly 0, we chose to do this in order to preserve the information that was present as the alternative would be to throw the entire row away. After this we dropped all of the rows containing NA values in any of the other columns. Since total voters is one of the main variables we care about it made sense to preserve as many rows as possible but if we replaced every NA value in the data with 0 that may potentially introduce a lot of error into the data, as the values are unlikely to be exactly 0, so we instead dropped all of the rows containing NA values, leaving us with 51,883 rows. We next randomly sampled 30 counties to utilize in our analysis, leaving our final data with 16,439 rows and, after de-aggregation, 1,908,907 individuals. 
 
 ```{r echo = FALSE}
 votes <- votes %>%
@@ -622,11 +622,13 @@ chart_fixef <- function(model) {
       round(Estimate - 1.96 * `Std. Error`, 3), ', ', 
       round(Estimate + 1.96 * `Std. Error`, 3), ']' )
     ) %>%
-    dplyr::select(Estimate, `95% CI`)
+    dplyr::select(Estimate, `Std. Error`, `95% CI`)
   
 
 }
 ```
+
+
 
 ## Model Assessment
 
@@ -673,17 +675,17 @@ ggroc(rocobj, size=1) +
 # fit model on full data
 
 # Fixed Effects
-temp <- chart_fixef(mod6)
-
-  temp[1:50,] %>%
-    kable(digits=3) %>%
-    kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
-    kable_classic()
-  
-  temp[51:56,] %>%
-    kable(digits=3) %>%
-    kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
-    kable_classic()
+# temp <- chart_fixef(mod6)
+# 
+#   temp[1:50,] %>%
+#     kable(digits=3) %>%
+#     kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+#     kable_classic()
+#   
+#   temp[51:56,] %>%
+#     kable(digits=3) %>%
+#     kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+#     kable_classic()
 
 # Uncomment below to show values for random effects in appendix
 
@@ -710,12 +712,80 @@ dotplot(ranef(mod6))$county_desc
 binnedplot(fitted(mod6), y = resid(mod6))
 ```
 
-```{r echo = FALSE, fig.width=3}
 
+
+
+# Conclusion
+
+Now, we can answer the research questions based on the model results.
+
+**Q1: How did different demographic subgroups vote in the 2020 general elections?**
+
+```{r}
+unique(data$party_cd)
+```
+
+```{r}
+chart_fixef(mod6)[2:5,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Party",
+        digits=3) %>%
+  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+    kable_classic()
+
+chart_fixef(mod6)[6:11,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Race",
+        digits=3) %>%
+  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+    kable_classic()
+
+chart_fixef(mod6)[12:13,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Ethnic",
+        digits=3) %>%
+  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+    kable_classic()
+
+chart_fixef(mod6)[14:15,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Sex",
+        digits=3) %>%
+  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+    kable_classic()
+
+chart_fixef(mod6)[16:18,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Age",
+        digits=3) %>%
+  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+    kable_classic()
 ```
 
 
-## Interpretation
+**Q2: Did the overall probability or odds of voting differ by county in 2020? Which counties differ the most from other counties?**
+
+```{r}
+dotplot(ranef(mod6))$county_desc
+```
+
+
+**Q3: How did the turnout rates differ between females and males for the different party affiliations?**
+
+```{r}
+chart_fixef(mod6)[19:26,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Party:Sex Interaction",
+        digits=3) %>%
+  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+    kable_classic()
+```
+
+
+**Q4: How did the turnout rates differ between age groups for the different party affiliations?**
+
+```{r}
+chart_fixef(mod6)[27:38,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Party:Age Interaction",
+        digits=3) %>%
+  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+    kable_classic()
+```
+
 
 Due to the large number of coefficients, we will only interpret a few for demonstration.
 
