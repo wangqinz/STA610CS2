@@ -4,8 +4,8 @@ author:
   -  Emily Gentles (Writer)
   -  Weiyi Liu (Coordinator and Checker)
   -  Jack McCarthy (Presenter)  
-  -  Qinzhe Wang (Coder)  
-date: "10/28/2021"
+  -  Qinzhe Wang (Programer)  
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   pdf_document:
 fontsize: 11pt
@@ -29,7 +29,7 @@ library(arm)
 library(knitr)
 ```
 
-# Introduction
+## Introduction
 
 Voter turnout is a huge topic of interest for both pollsters and candidates, especially around presidential elections and with particular focus on swing states, such as North Carolina. In this case study we will use North Carolina registration and turnout data, by county, for the 2020 election year. We wish to investigate what demographic factors such as age, race, and party affect turnout and whether turnout differs by county. 
 
@@ -42,6 +42,7 @@ votes <- read.table("history_stats_20201103.txt", header = TRUE, fill = TRUE, se
 # contains info about the aggregate counts of registered voters by demographic variables
 registers <- read.table("voter_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
 ```
+
 
 ```{r, echo = FALSE}
 # set "" or " " to NA
@@ -70,7 +71,7 @@ registers <- registers %>%
 
 ## Data Cleaning
 
-Note that we renamed the `history_stats_20201103` data as votes and the `voter_stats_20201103` data as registers. Within the votes and registers data we aggregated the total voters variable by taking the sum, ignoring NA values, and then left joined votes to registers on county and all the demographic features. We next replaced any NA values in total votes with 0. While these values are unlikely to be exactly 0, we chose to do this in order to preserve the information that was present as the alternative would be to throw the entire row away. After this we dropped all of the rows containing NA values in any of the other columns. Since total voters is one of the main variables we care about it made sense to preserve as many rows as possible but if we replaced every NA value in the data with 0 that may potentially introduce a lot of error into the data, as the values are unlikely to be exactly 0, so we instead dropped all of the rows containing NA values, leaving us with 51,883 rows. We next randomly sampled 30 counties to utilize in our analysis, leaving our final data with 16,439 rows and, after de-aggregation, 1,908,907 individuals. 
+Note that we renamed the `history_stats_20201103` data as votes and the `voter_stats_20201103` data as registers. Within the votes and registers data we aggregated the total voters variable by taking the sum, ignoring NA values, and then left joined votes to registers on county and all the demographic features. We next replaced any NA values in total votes with 0. While these values are unlikely to be exactly 0, we chose to do this in order to preserve the information that was present as the alternative would be to throw the entire row away. After this we dropped all of the rows containing NA values in any of the other columns. Since total voters is one of the main variables we care about it made sense to preserve as many rows as possible but if we replaced every NA value in the data with 0 that may potentially introduce a lot of error into the data, as the values are unlikely to be exactly 0, so we instead dropped all of the rows containing NA values, leaving us with 51,883 rows. For some subgroups that have more actual voters than registered voters, we replaced the number of actual voters by the number of registers to ensure the turn out rate to be valid. We next randomly sampled 30 counties to utilize in our analysis, leaving our final data with 16,439 rows and, after de-aggregation, 1,908,907 individuals. 
 
 ```{r, echo = FALSE}
 votes <- votes %>%
@@ -140,7 +141,17 @@ data2 <- data %>%
 
 ## EDA
 
-Below we see that most counties have a turnout rate over 70% with the average of all counties being 73%. The lowest turnout rate of 61% is from Robeson county. We also see that two counties, Forsyth and Cabarrus, have many more registered voters than the other sampled counties. When looking at race, age, gender, ethnicity, and party individually (plots in appendix) we found that white people had the highest turnout and number of voters registered while multiracial people had the lowest turnout rate, along with people of race 'other', and the smallest number of voters registered. The Republican party had the highest turnout while the Libertarian party had the lowest turnout. Both the Green party and the Constitution party had the lowest number of voters registered, less than 1500 each, so we combined these categories to provide our model with computational stability. When looking at ethnicities, people of Hispanic/Latinx ethnicity had both the lowest number of voters registered and turnout, a 20 point difference compared to people who weren't of Hispanic/Latinx ethnicity. Turnout rate varied very little by gender although people of unknown gender had the smallest number of voters registered. Looking at age we see that the age group of people 18-25 had both the lowest number of voters registered and turnout rate, a difference of 27 points when compared to those 66 and older. However, the age group of people 41-65 had the largest number of voters registered, nearly triple that of the 18-25 age group.
+Below we see that most counties have a turnout rate over 70% with the average of all counties being 73%. The lowest turnout rate of 61% is from Robeson county. We also see that two counties, Forsyth and Cabarrus, have many more registered voters than the other sampled counties. 
+
+When looking at race, age, gender, ethnicity, and party individually (plots in appendix), we found that white people had the highest turnout and number of voters registered while multiracial people had the lowest turnout rate, along with people of race 'other', and the smallest number of voters registered. We also found the race 'P' has extremely small sample size (115) compared with other race groups. Therefore, we decided to drop this group for computational efficiency.
+
+The Republican party had the highest turnout while the Libertarian party had the lowest turnout. Both the Green party and the Constitution party had the lowest number of voters registered, less than 1500 each, so we combined these categories to provide our model with computational stability. 
+
+When looking at ethnicities, people of Hispanic/Latinx ethnicity had both the lowest number of voters registered and turnout, a 20 point difference compared to people who weren't of Hispanic/Latinx ethnicity. 
+
+Turnout rate varied very little by gender although people of unknown gender had the smallest number of voters registered. 
+
+Looking at age we see that the age group of people 18-25 had both the lowest number of voters registered and turnout rate, a difference of 27 points when compared to those 66 and older. However, the age group of people 41-65 had the largest number of voters registered, nearly triple that of the 18-25 age group.
 
 ```{r, echo = FALSE, include = FALSE}
 table(data2$vote_or_not)
@@ -149,10 +160,9 @@ turnout_rate <- sum(data$total_vot) / sum(data$total_reg)
 data.frame(group = "Total", turnout_rate = turnout_rate)
 ```
 
+### Turnout Rate by County
 
-### Turnout Rate
-
-```{r, warning= F, fig.height= 4, fig.width= 10, echo = FALSE}
+```{r, warning= F, fig.height= 4, fig.width= 8, echo = FALSE}
 p1 <- data %>%
   group_by(county_desc) %>%
   summarise(total_reg = sum(total_reg),
@@ -185,8 +195,6 @@ p2 <- data %>%
 ```
 
 
-
-
 ```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE, include=FALSE}
 p3 <- data %>%
   group_by(race_code) %>%
@@ -210,7 +218,7 @@ p4 <- data %>%
   summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = race_code, y = n)) +
   geom_bar(stat = "identity") +
-  xlab("Party") + ylab("Sample size") +
+  xlab("Race") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
   ggtitle("Registered Voters vs. Race") +
     theme(plot.title = element_text(hjust = 0.5)) +
@@ -287,7 +295,7 @@ p8 <- data %>%
   summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = ethnic_code, y = n)) +
   geom_bar(stat = "identity") +
-  xlab("Party") + ylab("Sample size") +
+  xlab("Ethnic") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
   ggtitle("Registered Voters vs. Ethnic") +
     theme(plot.title = element_text(hjust = 0.5)) +
@@ -322,7 +330,7 @@ p10 <- data %>%
   summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = sex_code, y = n)) +
   geom_bar(stat = "identity") +
-  xlab("Party") + ylab("Sample size") +
+  xlab("Sex") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
   ggtitle("Registered Voters vs. Sex") +
     theme(plot.title = element_text(hjust = 0.5)) +
@@ -354,7 +362,7 @@ p12 <- data %>%
   summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = age, y = n)) +
   geom_bar(stat = "identity") +
-  xlab("Party") + ylab("Sample size") +
+  xlab("Age") + ylab("Sample size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
   ggtitle("Registered Voters vs. Age") +
     theme(plot.title = element_text(hjust = 0.5)) +
@@ -369,7 +377,7 @@ grid.arrange(p11,p12, nrow= 1)
 
 Next we move on to EDA related to interactions. We're interested in any potential differences in turnout rate for females and males with various party affiliations. In the graph below we see that females have higher turnout rates than males for each party. People with unknown genders, however, often have the highest turnout rate. For parties with substantial turnout rates, the Republican and Democrat parties, as well as those unaffiliated with a party, females had a larger number of voters registered than males and people with unknown genders had a much smaller number of voters registered. Note that, even after combining the Green and Constitutional parties, the number of registered voters for these parties is still quite small, relative to the other parties.
 
-```{r, warning= F, fig.height= 4, fig.width= 10, echo = FALSE}
+```{r, warning= F, fig.height= 3, fig.width= 10, echo = FALSE}
 p13 <- data %>%
   group_by(sex_code, party_cd) %>%
   summarise(total_reg = sum(total_reg),
@@ -392,7 +400,7 @@ p14 <- data %>%
   mutate(group = paste0(sex_code, " with ", party_cd)) %>%
   ggplot( aes(x = group, y = n, fill = party_cd)) +
   geom_bar(stat = "identity") +
-  xlab("Age * Party") + ylab("Size") +
+  xlab("Sex * Party") + ylab("Size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.3) +
   coord_flip() +
   ggtitle("Registered Voters vs. Age*Party") +
@@ -472,7 +480,7 @@ p18 <- data %>%
   mutate(group = paste0(age, " with ", race_code)) %>%
   ggplot( aes(x = group, y = n, fill = race_code)) +
   geom_bar(stat = "identity") +
-  xlab("Age * Party") + ylab("Size") +
+  xlab("Age * Race") + ylab("Size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.3) +
   coord_flip() +
   ggtitle("Registered Voters vs. Age*Race") +
@@ -500,7 +508,7 @@ data <- data %>%
 ```
 
 
-# Model
+## Model
 
 With our exploration of the data complete, we now begin our model building. From the research questions we have an idea of what must be included in the model; this includes main effect for party, sex, and age, as well as random intercepts by county. This will be our base model. From the research questions we also know that we likely need an interaction term between age and party as well as sex and party. Additionally, since our dependent variable, turnout rate, is between 0 and 1, we know we should use a logistic mixed effects model. Below we see the output from forward selection. We see that the last model, with interactions between sex and party, age and party, as well as age and race, has the lowest BIC and AIC so this will be our final model.
 
@@ -603,7 +611,7 @@ chart_fixef <- function(model) {
 
 
 
-## Model Assessment
+### Model Assessment
 
 From our EDA it can reasonably be assumed that the linearity condition is met for our model and that multicollinearity is not an issue. As we see in the binned residual plot below, there may cause for some concern as some points with expected values between 0.8 and 0.9 fall out of the range of the confidence bands. However, relative to the amount of data we have, these 8 points, in addition to 7 other scattered points outside the confidence bands, don't point to our model being incorrect. We see that the model has an AUC around 0.7 which is satisfactory and much better than a coin flip. Our model seems to more accurately identify positives than negatives as well. 
 
@@ -688,7 +696,7 @@ binnedplot(fitted(mod6), y = resid(mod6))
 ```
 
 
-# Conclusion
+## Conclusion
 
 Now, we can answer the research questions based on the model results.
 
@@ -839,9 +847,7 @@ chart_fixef(mod6)[27:38,] %>%
 ```
 
 
-
-
-# Strengths and Limitations
+## Strengths and Limitations
 
 Limitations of our model include the fact that during data cleaning we dropped rows that contained missing values. While we are working with almost 2 million observations, we do have quite a few small demographic groups, especially for our interaction terms. A possible alternative would have been to impute values for the missing data so that we could keep as many rows as possible. Obviously imputation comes with it's own set of assumptions and limitations. 
 
