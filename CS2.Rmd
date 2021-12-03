@@ -13,7 +13,7 @@ geometry: "left=1.5cm,right=1.5cm,top=1.25cm,bottom=1.75cm"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(cache = F, message = F, warning =F)
+knitr::opts_chunk$set(cache = T, message = F, warning =F)
 library(tidyverse)
 library(lme4)
 library(pROC)
@@ -152,7 +152,7 @@ data.frame(group = "Total", turnout_rate = turnout_rate)
 
 ### Turnout Rate
 
-```{r, warning= F, fig.width= 10, echo = FALSE}
+```{r, warning= F, fig.height= 4, fig.width= 10, echo = FALSE}
 p1 <- data %>%
   group_by(county_desc) %>%
   summarise(total_reg = sum(total_reg),
@@ -369,7 +369,7 @@ grid.arrange(p11,p12, nrow= 1)
 
 Next we move on to EDA related to interactions. We're interested in any potential differences in turnout rate for females and males with various party affiliations. In the graph below we see that females have higher turnout rates than males for each party. People with unknown genders, however, often have the highest turnout rate. For parties with substantial turnout rates, the Republican and Democrat parties, as well as those unaffiliated with a party, females had a larger number of voters registered than males and people with unknown genders had a much smaller number of voters registered. Note that, even after combining the Green and Constitutional parties, the number of registered voters for these parties is still quite small, relative to the other parties.
 
-```{r, warning= F, fig.width= 10, echo = FALSE}
+```{r, warning= F, fig.height= 4, fig.width= 10, echo = FALSE}
 p13 <- data %>%
   group_by(sex_code, party_cd) %>%
   summarise(total_reg = sum(total_reg),
@@ -408,7 +408,7 @@ grid.arrange(widths = c(3, 3, 1),p13 + theme(legend.position="none"),
 
 We are also interested in the potential difference between age groups in various political parties. From the graphs below we see that the age group of 66 and older has the highest turnout rate for every political party and the age group 18-25 has the lowest. In general, it seems that, across parties, as age increases, turnout rate also increases. As noted previously, the age group 41-65 has the largest number of registered voters for both of the main parties, Republican and Democrat, and for unaffiliated voters.
 
-```{r, warning= F, fig.width= 10, echo = FALSE}
+```{r, warning= F, fig.height= 4, fig.width= 10, echo = FALSE}
 p15 <- data %>%
   group_by(age, party_cd) %>%
   summarise(total_reg = sum(total_reg),
@@ -449,7 +449,7 @@ grid.arrange(widths = c(3, 3, 1),p15 + theme(legend.position="none"),
 
 We are also interested in a potential relationship between age and race. In the graphs below we see a general trend that, across races, as the age increase so too does the turnout rate. We also see that, within each age group, white people make up the majority of registered voters.
 
-```{r, warning= F, fig.width= 10, echo = FALSE}
+```{r, warning= F, fig.height= 4, fig.width= 10, echo = FALSE}
 p17 <- data %>%
   group_by(age, race_code) %>%
   summarise(total_reg = sum(total_reg),
@@ -595,13 +595,8 @@ data.frame("Model" = model, 'LRT p-value' = LRT, 'AIC' = AIC_score, 'BIC' = BIC_
 chart_fixef <- function(model) {
  summary(model)$coefficients %>%
     as.data.frame() %>%
-    mutate(`lower bound` = round(Estimate - 1.96 * `Std. Error`, 4),
-           `upper bound` = round(Estimate + 1.96 * `Std. Error`, 4)) %>%
-    # mutate(`95% CI` = paste0(
-    #   '[', 
-    #   round(Estimate - 1.96 * `Std. Error`, 4), ', ', 
-    #   round(Estimate + 1.96 * `Std. Error`, 4), ']' )
-    # ) %>%
+    mutate(`95% lower` = round(Estimate - 1.96 * `Std. Error`, 4),
+           `95% upper` = round(Estimate + 1.96 * `Std. Error`, 4)) %>%
     dplyr::select(Estimate, `Std. Error`, `95% lower`, `95% upper`)
 }
 ```
@@ -610,10 +605,10 @@ chart_fixef <- function(model) {
 
 ## Model Assessment
 
-From our EDA it can reasonably be assumed that the linearity condition is met for our model and that multicollinearity is not an issue. As we see in the binned residual plot below, there may cause for some concern as some points with expected values between 0.8 and 0.9 fall out of the range of the confidence bands. However, relative to the amount of data we have, these 8 points, in addition to 7 other scattered points outside the confidence bands, don't point to our model being incorrect. We see that the model has an AUC around 0.7 which is satisfactory and much better than a coin flip. Our model seems to more accurately identify positives than negatives as well. We also see a plot of the random effects for each county and observe clear heterogeneity across counties. Robeson county has the smallest estimate and is quite far from the nearest county, Scotland, while Cabarrus has the largest estimate. A table with the estimates and corresponding confidence intervals is included in the appendix.
+From our EDA it can reasonably be assumed that the linearity condition is met for our model and that multicollinearity is not an issue. As we see in the binned residual plot below, there may cause for some concern as some points with expected values between 0.8 and 0.9 fall out of the range of the confidence bands. However, relative to the amount of data we have, these 8 points, in addition to 7 other scattered points outside the confidence bands, don't point to our model being incorrect. We see that the model has an AUC around 0.7 which is satisfactory and much better than a coin flip. Our model seems to more accurately identify positives than negatives as well. 
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.width = 4, fig.height = 3 }
 
 # expand data from aggregated format
 data_expand <- data %>%
@@ -704,10 +699,11 @@ Now, we can answer the research questions based on the model results.
 Notice that our final model incorporated the interaction terms `sex:party` and `age:party`, we should interpret the effects of party at the baseline levels of the other two terms (female and age 18-25).
 
 ```{r, echo = FALSE}
-data.frame(chart_fixef(mod6)[2:5,]) %>%
+chart_fixef(mod6)[2:5,] %>%
   kable(caption = "Estiamtes and 95% CI of Fixed Effects for Party",
-        digits=4) %>%
+        digits=4, format = "markdown") %>%
   kable_styling(latex_options = c("HOLD_position","striped"))
+
 ```
 
 
@@ -728,8 +724,8 @@ compared with an 18-25 year old female GRE/CST voter.
 ```{r, echo = FALSE}
 chart_fixef(mod6)[6:11,] %>%
   kable(caption = "Estiamtes and 95% CI of Fixed Effects for Race",
-        digits=4) %>%
-  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
     kable_classic()
 ```
 
@@ -743,7 +739,7 @@ an 18-25 year old White voter has $e^{0.2318} = 1.2609$ times (a 26% increase) t
 
 an 18-25 year old Asian voter has $e^{0.1517} = 1.1638$ times (a 16% increase) the odds of voting
 
-an 18-25 year old Islander voter has $e^{-0.2409} = 0.7859$ times (a 21% decrease) the odds of voting
+an 18-25 year old Indian American voter has $e^{-0.2409} = 0.7859$ times (a 21% decrease) the odds of voting
 
 an 18-25 year old voter in other race has $e^{-0.1098} = 0.8960$ times (a 10% decrease) the odds of voting
 
@@ -754,8 +750,8 @@ compared with an 18-25 year old multiracial voter.
 ```{r, echo = FALSE}
 chart_fixef(mod6)[12:13,] %>%
   kable(caption = "Estiamtes and 95% CI of Fixed Effects for Ethnic",
-        digits=4) %>%
-  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
     kable_classic()
 ```
 
@@ -773,8 +769,8 @@ compared with a Hispanic/Latino voter.
 ```{r, echo = FALSE}
 chart_fixef(mod6)[14:15,] %>%
   kable(caption = "Estiamtes and 95% CI of Fixed Effects for Sex",
-        digits=4) %>%
-  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
     kable_classic()
 ```
 
@@ -794,8 +790,8 @@ However, neither of these coefficients are significant since none of the 95% CIs
 ```{r, echo = FALSE}
 chart_fixef(mod6)[16:18,] %>%
   kable(caption = "Estiamtes and 95% CI of Fixed Effects for Age",
-        digits=4) %>%
-  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
     kable_classic()
 ```
 
@@ -813,38 +809,36 @@ compared with an 18-25 year old multiracial CST/GRE voter.
 
 **Q2: Did the overall probability or odds of voting differ by county in 2020? Which counties differ the most from other counties?**
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.height = 4.5, fig.width= 10}
 dotplot(ranef(mod6))$county_desc
 ```
+
+The above dotplot displays the random effects for each county. Since we observe clear heterogeneity across counties, we can conclude the overall probability of voting differed by county in 2020. Robeson county has the smallest estimate, while Cabarrus has the largest estimate. Furthermore, Robeson differs the most from all other counties. A table with the estimates and corresponding confidence intervals is included in the appendix.
 
 
 **Q3: How did the turnout rates differ between females and males for the different party affiliations?**
 
 ```{r, echo = FALSE}
 chart_fixef(mod6)[19:26,] %>%
-  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Party:Sex Interaction",
-        digits=3) %>%
-  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Party:Sex",
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
     kable_classic()
 ```
+From the table above, only the fixed effects for `party_cdLIB:sex_codeU` is significant (the 95% CI does not cover 0). For simplicity, we only interpret this fixed effect.
 
 
 **Q4: How did the turnout rates differ between age groups for the different party affiliations?**
 
 ```{r, echo = FALSE}
 chart_fixef(mod6)[27:38,] %>%
-  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Party:Age Interaction",
-        digits=3) %>%
-  kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Party:Age",
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
     kable_classic()
 ```
 
 
-Due to the large number of coefficients, we will only interpret a few for demonstration.
-
-Our baseline is that of a female aligned with party ??, of mixed race and Hispanic/Latina ethnicity, in the age category 18-25. The odds of this person voting is .
-
-Holding all else constant, a male aligned with party ??, of mixed race and Hispanic/Latino ethnicity, in the age category 18-25 has exp() times the odds of the baseline of voting.
 
 
 # Strengths and Limitations
