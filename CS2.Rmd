@@ -31,7 +31,7 @@ library(knitr)
 
 ## Introduction
 
-Voter turnout is a huge topic of interest for both pollsters and candidates, especially around presidential elections and with particular focus on swing states, such as North Carolina. In this case study we will use North Carolina registration and turnout data, by county, for the 2020 election year. We wish to investigate what demographic factors such as age, race, and party affect turnout and whether turnout differs by county. 
+Voter turnout is a huge topic of interest for both pollsters and candidates, especially around presidential elections and with a particular focus on swing states, such as North Carolina. In this case study we will use North Carolina registration and turnout data, by county, for the 2020 election year. We wish to investigate what demographic factors such as age, race, and party affect turnout and whether turnout differs by county. 
 
 ```{r, echo = FALSE}
 # Explanation of abbreviations: https://s3.amazonaws.com/dl.ncsbe.gov/data/layout_ncvoter.txt
@@ -143,7 +143,7 @@ data2 <- data %>%
 
 Below we see that most counties have a turnout rate over 70% with the average of all counties being 73%. The lowest turnout rate of 61% is from Robeson county. We also see that two counties, Forsyth and Cabarrus, have many more registered voters than the other sampled counties. 
 
-When looking at race, age, gender, ethnicity, and party individually (plots in appendix), we found that white people had the highest turnout and number of voters registered while multiracial people had the lowest turnout rate, along with people of race 'other', and the smallest number of voters registered. We also found the race 'P' has extremely small sample size (115) compared with other race groups. Therefore, we decided to drop this group for computational efficiency.
+When looking at race, age, gender, ethnicity, and party individually (plots in appendix), we found that white people had the highest turnout and number of voters registered while multiracial people had the lowest turnout rate, along with people of race 'other', and the smallest number of voters registered. We also found the race 'P' has an extremely small sample size (115) compared with other race groups. Therefore, we decided to drop this group for computational efficiency.
 
 The Republican party had the highest turnout while the Libertarian party had the lowest turnout. Both the Green party and the Constitution party had the lowest number of voters registered, less than 1500 each, so we combined these categories to provide our model with computational stability. 
 
@@ -375,7 +375,7 @@ grid.arrange(p11,p12, nrow= 1)
 
 ### Gender & Party
 
-Next we move on to EDA related to interactions. We're interested in any potential differences in turnout rate for females and males with various party affiliations. In the graph below we see that females have higher turnout rates than males for each party. People with unknown genders, however, often have the highest turnout rate. For parties with substantial turnout rates, the Republican and Democrat parties, as well as those unaffiliated with a party, females had a larger number of voters registered than males and people with unknown genders had a much smaller number of voters registered. Note that, even after combining the Green and Constitutional parties, the number of registered voters for these parties is still quite small, relative to the other parties.
+Next we move on to EDA related to interactions. We're interested in any potential differences in turnout rates for females and males with various party affiliations. In the graph below we see that females have higher turnout rates than males for each party. People with unknown genders, however, often have the highest turnout rate. For parties with substantial turnout rates, the Republican and Democrat parties, as well as those unaffiliated with a party, females had a larger number of voters registered than males and people with unknown genders had a much smaller number of voters registered. Note that, even after combining the Green and Constitutional parties, the number of registered voters for these parties is still quite small, relative to the other parties.
 
 ```{r, warning= F, fig.height= 3, fig.width= 10, echo = FALSE}
 p13 <- data %>%
@@ -414,7 +414,7 @@ grid.arrange(widths = c(3, 3, 1),p13 + theme(legend.position="none"),
 
 ###  Age & Party
 
-We are also interested in the potential difference between age groups in various political parties. From the graphs below we see that the age group of 66 and older has the highest turnout rate for every political party and the age group 18-25 has the lowest. In general, it seems that, across parties, as age increases, turnout rate also increases. As noted previously, the age group 41-65 has the largest number of registered voters for both of the main parties, Republican and Democrat, and for unaffiliated voters.
+We are also interested in the potential difference between age groups in various political parties. From the graphs below we see that the age group of 66 and older have the highest turnout rate for every political party and the age group 18-25 has the lowest. In general, it seems that, across parties, as age increases, the turnout rate also increases. As noted previously, the age group 41-65 has the largest number of registered voters for both of the main parties, Republican and Democrat, and for unaffiliated voters.
 
 ```{r, warning= F, fig.height= 4, fig.width= 10, echo = FALSE}
 p15 <- data %>%
@@ -510,7 +510,7 @@ data <- data %>%
 
 ## Model
 
-With our exploration of the data complete, we now begin our model building. From the research questions we have an idea of what must be included in the model; this includes main effect for party, sex, and age, as well as random intercepts by county. This will be our base model. From the research questions we also know that we likely need an interaction term between age and party as well as sex and party. Additionally, since our dependent variable, turnout rate, is between 0 and 1, we know we should use a logistic mixed effects model. Below we see the output from forward selection. We see that the last model, with interactions between sex and party, age and party, as well as age and race, has the lowest BIC and AIC so this will be our final model.
+With our exploration of the data complete, we now begin our model building. From the research questions we have an idea of what must be included in the model; this includes the main effect for party, sex, and age, as well as random intercepts by county. This will be our base model. From the research questions we also know that we likely need an interaction term between age and party as well as sex and party. Additionally, since our dependent variable, turnout rate, is between 0 and 1, we know we should use a logistic mixed effects model. Below we see the output from the forward selection. We see that the last model, with interactions between sex and party, age and party, as well as age and race, has the lowest BIC and AIC so this will be our final model.
 
 $$
 \begin{aligned}
@@ -751,7 +751,7 @@ an 18-25 year old Indian American voter has $e^{-0.2409} = 0.7859$ times (a 21% 
 
 an 18-25 year old voter in other race has $e^{-0.1098} = 0.8960$ times (a 10% decrease) the odds of voting
 
-compared with an 18-25 year old multiracial voter.
+compared with an 18-25 year-old multiracial voter.
 
 ### Ethnic
 
@@ -821,7 +821,7 @@ compared with an 18-25 year old multiracial CST/GRE voter.
 dotplot(ranef(mod6))$county_desc
 ```
 
-The above dotplot displays the random effects for each county. Since we observe clear heterogeneity across counties, we can conclude the overall probability of voting differed by county in 2020. Robeson county has the smallest estimate, while Cabarrus has the largest estimate. Furthermore, Robeson differs the most from all other counties. A table with the estimates and corresponding confidence intervals is included in the appendix.
+The above dotplot displays the random effects for each county. Since we observe clear heterogeneity across counties, we can conclude the overall probability of voting differed by county in 2020. Robeson County has the smallest estimate, while Cabarrus has the largest estimate. Furthermore, Robeson differs the most from all other counties. A table with the estimates and corresponding confidence intervals is included in the appendix.
 
 
 **Q3: How did the turnout rates differ between females and males for the different party affiliations?**
@@ -833,6 +833,7 @@ chart_fixef(mod6)[19:26,] %>%
   kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
     kable_classic()
 ```
+
 From the table above, only the fixed effects for `party_cdLIB:sex_codeU` is significant (the 95% CI does not cover 0). For simplicity, we only interpret this fixed effect.
 
 
