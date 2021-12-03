@@ -9,7 +9,7 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   pdf_document:
 fontsize: 11pt
-geometry: "left=1.5cm,right=1.5cm,top=1.25cm,bottom=1.75cm"
+geometry: "left=1.5cm,right=1.5cm,top=1.25cm,bottom=1.5cm"
 ---
 
 ```{r setup, include=FALSE}
@@ -403,7 +403,7 @@ p14 <- data %>%
   xlab("Sex * Party") + ylab("Size") +
   geom_text(aes(label=format(n, digits = 2)), hjust = -0.3) +
   coord_flip() +
-  ggtitle("Registered Voters vs. Age*Party") +
+  ggtitle("Registered Voters vs. Sex*Party") +
     theme(plot.title = element_text(hjust = 0.5))
 
 legend <- get_legend(p13)
@@ -617,6 +617,9 @@ From our EDA it can reasonably be assumed that the linearity condition is met fo
 
 
 ```{r, echo = FALSE, fig.width = 4, fig.height = 3 }
+# test <- binned_residuals(mod6)
+binnedplot(fitted(mod6), y = resid(mod6))
+
 
 # expand data from aggregated format
 data_expand <- data %>%
@@ -690,9 +693,6 @@ ggroc(rocobj, size=1) +
 # # Random Effects
 # dotplot(ranef(mod6))$county_desc
 
-
-# test <- binned_residuals(mod6)
-binnedplot(fitted(mod6), y = resid(mod6))
 ```
 
 
@@ -702,7 +702,7 @@ Now, we can answer the research questions based on the model results.
 
 **Q1: How did different demographic subgroups vote in the 2020 general elections?**
 
-### Party
+**Party**
 
 Notice that our final model incorporated the interaction terms `sex:party` and `age:party`, we should interpret the effects of party at the baseline levels of the other two terms (female and age 18-25).
 
@@ -727,7 +727,7 @@ an 18-25 year old female UNA voter has $e^{-0.1791} = 0.8360$ times (a 17% decre
 
 compared with an 18-25 year old female GRE/CST voter.
 
-### Race
+**Race**
 
 ```{r, echo = FALSE}
 chart_fixef(mod6)[6:11,] %>%
@@ -753,7 +753,7 @@ an 18-25 year old voter in other race has $e^{-0.1098} = 0.8960$ times (a 10% de
 
 compared with an 18-25 year-old multiracial voter.
 
-### Ethnic
+**Ethnic**
 
 ```{r, echo = FALSE}
 chart_fixef(mod6)[12:13,] %>%
@@ -772,7 +772,7 @@ a voter with unkown ethnic has $e^{0.3618} = 1.4359$ times (a 44% increase) the 
 
 compared with a Hispanic/Latino voter.
 
-### Sex
+**Sex**
 
 ```{r, echo = FALSE}
 chart_fixef(mod6)[14:15,] %>%
@@ -786,14 +786,14 @@ Holding all other predictors unchanged:
 
 a male CST/GRE voter has $e^{-0.0728} = 0.9298$ times (a 7% decrease) the odds of voting
 
-a CST/GRE voter with unknown gender has $e^{0.1790} = 1.1960$ times (a 20% increase) the odds of voting
+a CST/GRE voter with undesignated gender has $e^{0.1790} = 1.1960$ times (a 20% increase) the odds of voting
 
 compared with a female CST/GRE voter.
 
 However, neither of these coefficients are significant since none of the 95% CIs cover 0.
 
 
-### Age
+**Age**
 
 ```{r, echo = FALSE}
 chart_fixef(mod6)[16:18,] %>%
@@ -834,7 +834,7 @@ chart_fixef(mod6)[19:26,] %>%
     kable_classic()
 ```
 
-From the table above, only the fixed effects for `party_cdLIB:sex_codeU` is significant (the 95% CI does not cover 0). For simplicity, we only interpret this fixed effect.
+From the table above, only the fixed effects for `party_cdLIB:sex_codeU` is significant (the 95% CI does not cover 0). For simplicity, we only interpret this fixed effect: A Libertarian voter with undesignated gender has $e^{0.4754} = 1.6087$ times the odds of voting.
 
 
 **Q4: How did the turnout rates differ between age groups for the different party affiliations?**
@@ -848,14 +848,27 @@ chart_fixef(mod6)[27:38,] %>%
 ```
 
 
+From the table above, we see some of the fixed effects are significant, we only interpret them:
+
+A 26-40 year old Democratic voter has $e^{-0.2391} = 0.7873$ times the odds of voting.
+
+A 41-65 year old Democratic voter has $e^{0.4162} = 1.5162$ times the odds of voting.
+
+A 41-65 year old Republican voter has $e^{0.5018} = 1.6517$ times the odds of voting.
+
+A 41-65 year old voter with undesignated party has $e^{0.5563} = 1.7442$ times the odds of voting.
+
+An over 66 year old Republican voter has $e^{0.5102} = 1.6656$ times the odds of voting.
+
+An over 66 year old voter with undesignated party has $e^{0.8719} = 2.3915$ times the odds of voting.
+
+
+
 ## Strengths and Limitations
 
-Limitations of our model include the fact that during data cleaning we dropped rows that contained missing values. While we are working with almost 2 million observations, we do have quite a few small demographic groups, especially for our interaction terms. A possible alternative would have been to impute values for the missing data so that we could keep as many rows as possible. Obviously imputation comes with it's own set of assumptions and limitations. 
+**Strengths:** A major strength of our model is the inclusion of random intercepts by county which allows us to understand the difference in turnout rate between each county. 
 
-Other limitations ?
+**Limitations:** Firstly, we dropped rows that contained missing values during data cleaning . While we are working with almost 2 million observations, we do have quite a few small demographic groups, especially for our interaction terms. A possible alternative would have been to impute values for the missing data so that we could keep as many rows as possible. Obviously imputation comes with it's own set of assumptions and limitations. In addition, we did not try poststratiﬁcation to re-adjust the proportions among demographic groups. This could lead to slightly biased result.
 
-A major strength of our model is the inclusion of random intercepts by county which allows us to understand the difference in turnout rate between each county. 
-
-Other strengths ?
   
   
