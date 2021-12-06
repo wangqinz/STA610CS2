@@ -162,7 +162,7 @@ data.frame(group = "Total", turnout_rate = turnout_rate)
 
 ### Turnout Rate by County
 
-```{r, warning= F, fig.height= 4, fig.width= 8, echo = FALSE}
+```{r, warning= F, fig.height= 4, fig.width= 10, echo = FALSE}
 p1 <- data %>%
   group_by(county_desc) %>%
   summarise(total_reg = sum(total_reg),
@@ -184,8 +184,9 @@ p2 <- data %>%
   summarize(n = sum(total_reg), .groups="drop") %>%
   ggplot( aes(x = fct_reorder(county_desc,n), y = n)) +
   geom_bar(stat = "identity") +
+  ylim(0, 300000) +
   xlab("Party") + ylab("Sample size") +
-  geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
   ggtitle("Registered Voters by County") +
     theme(plot.title = element_text(hjust = 0.5)) +
   ylim(0,3.15e5) +
@@ -206,7 +207,7 @@ p3 <- data %>%
   geom_bar(stat = "identity") +
   ylim(0,1) +
   xlab("Race") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.4) +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
   ggtitle("Turnout rate vs. Race") +
     theme(plot.title = element_text(hjust = 0.5)) +
     coord_flip()
@@ -219,7 +220,7 @@ p4 <- data %>%
   ggplot( aes(x = race_code, y = n)) +
   geom_bar(stat = "identity") +
   xlab("Race") + ylab("Sample size") +
-  geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
   ggtitle("Registered Voters vs. Race") +
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
@@ -247,7 +248,7 @@ p5 <- data %>%
   geom_bar(stat = "identity") +
   ylim(0,1) +
   xlab("Party") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2)), vjust = -0.5) +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
   ggtitle("Turnout rate vs. Party") +
     theme(plot.title = element_text(hjust = 0.5))  +
     coord_flip()
@@ -258,7 +259,7 @@ p6 <- data %>%
   ggplot( aes(x = party_cd, y = n)) +
   geom_bar(stat = "identity") +
   xlab("Party") + ylab("Sample size") +
-  geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
   ggtitle("Registered Voters vs. Party") +
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
@@ -285,7 +286,7 @@ p7 <- data %>%
   geom_bar(stat = "identity") +
   ylim(0,1) +
   xlab("Ethnic") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2)), vjust = -0.5) +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
   ggtitle("Turnout rate vs. Ethnic") +
     theme(plot.title = element_text(hjust = 0.5))+
     coord_flip()
@@ -296,7 +297,7 @@ p8 <- data %>%
   ggplot( aes(x = ethnic_code, y = n)) +
   geom_bar(stat = "identity") +
   xlab("Ethnic") + ylab("Sample size") +
-  geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
   ggtitle("Registered Voters vs. Ethnic") +
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
@@ -320,7 +321,7 @@ grid.arrange(p7,p8, nrow= 1)
   geom_bar(stat = "identity") +
   ylim(0,1) +
   xlab("Sex") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2)), vjust = -0.5) +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
   ggtitle("Turnout rate vs. Sex") +
     theme(plot.title = element_text(hjust = 0.5)) + 
     coord_flip()
@@ -331,7 +332,7 @@ p10 <- data %>%
   ggplot( aes(x = sex_code, y = n)) +
   geom_bar(stat = "identity") +
   xlab("Sex") + ylab("Sample size") +
-  geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
   ggtitle("Registered Voters vs. Sex") +
     theme(plot.title = element_text(hjust = 0.5)) +
   coord_flip()
@@ -352,7 +353,7 @@ p11 <- data %>%
   geom_bar(stat = "identity") +
   ylim(0,1) +
   xlab("Age") + ylab("Turnout rate") +
-  geom_text(aes(label=format(turnout_rate, digits = 2)), vjust = -0.5) +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
   ggtitle("Turnout rate vs. Age") +
     theme(plot.title = element_text(hjust = 0.5))+
     coord_flip()
@@ -363,7 +364,7 @@ p12 <- data %>%
   ggplot( aes(x = age, y = n)) +
   geom_bar(stat = "identity") +
   xlab("Age") + ylab("Sample size") +
-  geom_text(aes(label=format(n, digits = 2)), hjust = -0.2) +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
   ggtitle("Registered Voters vs. Age") +
     theme(plot.title = element_text(hjust = 0.5)) +
   ylim(0,8.8e05) +
@@ -377,7 +378,7 @@ grid.arrange(p11,p12, nrow= 1)
 
 Next we move on to EDA related to interactions. We're interested in any potential differences in turnout rates for females and males with various party affiliations. In the graph below we see that females have higher turnout rates than males for each party. People with unknown genders, however, often have the highest turnout rate. For parties with substantial turnout rates, the Republican and Democrat parties, as well as those unaffiliated with a party, females had a larger number of voters registered than males and people with unknown genders had a much smaller number of voters registered. Note that, even after combining the Green and Constitutional parties, the number of registered voters for these parties is still quite small, relative to the other parties.
 
-```{r, warning= F, fig.height= 3, fig.width= 10, echo = FALSE}
+```{r, warning= F, fig.height= 3, fig.width= 12, echo = FALSE}
 p13 <- data %>%
   group_by(sex_code, party_cd) %>%
   summarise(total_reg = sum(total_reg),
@@ -401,7 +402,7 @@ p14 <- data %>%
   ggplot( aes(x = group, y = n, fill = party_cd)) +
   geom_bar(stat = "identity") +
   xlab("Sex * Party") + ylab("Size") +
-  geom_text(aes(label=format(n, digits = 2)), hjust = -0.3) +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.05) +
   coord_flip() +
   ggtitle("Registered Voters vs. Sex*Party") +
     theme(plot.title = element_text(hjust = 0.5))
@@ -416,7 +417,7 @@ grid.arrange(widths = c(3, 3, 1),p13 + theme(legend.position="none"),
 
 We are also interested in the potential difference between age groups in various political parties. From the graphs below we see that the age group of 66 and older have the highest turnout rate for every political party and the age group 18-25 has the lowest. In general, it seems that, across parties, as age increases, the turnout rate also increases. As noted previously, the age group 41-65 has the largest number of registered voters for both of the main parties, Republican and Democrat, and for unaffiliated voters.
 
-```{r, warning= F, fig.height= 4, fig.width= 10, echo = FALSE}
+```{r, warning= F, fig.height= 3.5, fig.width= 12, echo = FALSE}
 p15 <- data %>%
   group_by(age, party_cd) %>%
   summarise(total_reg = sum(total_reg),
@@ -440,7 +441,7 @@ p16 <- data %>%
   ggplot( aes(x = group, y = n, fill = party_cd)) +
   geom_bar(stat = "identity") +
   xlab("Age * Party") + ylab("Size") +
-  geom_text(aes(label=format(n, digits = 2)), hjust = -0.3) +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.05) +
   coord_flip() +
   ggtitle("Registered Voters vs. Age*Party") +
     theme(plot.title = element_text(hjust = 0.5))
@@ -457,7 +458,7 @@ grid.arrange(widths = c(3, 3, 1),p15 + theme(legend.position="none"),
 
 We are also interested in a potential relationship between age and race. In the graphs below we see a general trend that, across races, as the age increase so too does the turnout rate. We also see that, within each age group, white people make up the majority of registered voters.
 
-```{r, warning= F, fig.height= 4, fig.width= 10, echo = FALSE}
+```{r, warning= F, fig.height= 3.8, fig.width= 12, echo = FALSE}
 p17 <- data %>%
   group_by(age, race_code) %>%
   summarise(total_reg = sum(total_reg),
@@ -481,7 +482,7 @@ p18 <- data %>%
   ggplot( aes(x = group, y = n, fill = race_code)) +
   geom_bar(stat = "identity") +
   xlab("Age * Race") + ylab("Size") +
-  geom_text(aes(label=format(n, digits = 2)), hjust = -0.3) +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.05) +
   coord_flip() +
   ggtitle("Registered Voters vs. Age*Race") +
     theme(plot.title = element_text(hjust = 0.5))
@@ -514,9 +515,12 @@ With our exploration of the data complete, we now begin our model building. From
 
 $$
 \begin{aligned}
-log\left(\frac{\pi_{ij}}{1-\pi_{ij}}\right)&=\beta_0+\sum_k\beta_{1k}\mathbb{1}[P_{ij}=k]+\sum_k\beta_{2k}\mathbb{1}[R_{ij}=k]+\sum_k\beta_{3k}\mathbb{1}[E_{ij}=k]+\sum_k\beta_{4k}\mathbb{1}[S_{ij}=k]\\
-&+\sum_k\beta_{5k}\mathbb{1}[A_{ij}=k]+\sum_{k,l}\beta_{6k}\mathbb{1}[S_{ij}=k]\mathbb{1}[P_{ij}=k]+\sum_{k,l}\beta_{7k}\mathbb{1}[A_{ij}=k]\mathbb{1}[P_{ij}=k]\\
-&+\sum_{k,l}\beta_{8k}\mathbb{1}[A_{ij}=k]\mathbb{1}[R_{ij}=k] +b_{0j}
+log\left(\frac{\pi_{ij}}{1-\pi_{ij}}\right)
+&=\beta_0 + \sum_{k_p} \beta_{1k_p} \mathbb{I}[P_{ij}=k_p] + \sum_{k_r} \beta_{2k_r} \mathbb{I}[R_{ij}=k_r] + \sum_{k_e} \beta_{3k_e} \mathbb{I}[E_{ij}=k_e] + \sum_{k_s} \beta_{4k_s} \mathbb{I}[S_{ij}=k_s]
+\\
+&+ \sum_{k_a} \beta_{5k_a} \mathbb{I}[A_{ij}=k_a] + \sum_{k_s,k_p} \beta_{6k_sk_p} \mathbb{I}[S_{ij}=k_s] \mathbb{I}[P_{ij}=k_p] + \sum_{k_a,k_p} \beta_{7k_ak_p} \mathbb{I}[A_{ij}=k_a] \mathbb{I}[P_{ij}=k_p]
+\\
+&+ \sum_{k_a,k_r} \beta_{8k_ak_r} \mathbb{I}[A_{ij}=k_a] \mathbb{I}[R_{ij}=k_r] + b_{0j}
 \end{aligned}
 $$
 where $\pi_{ij}=Pr(y_{ij}=1)$ and $b_{0j}\overset{\text{iid}}{\sim} N(0,\sigma^2)$ and
@@ -525,15 +529,15 @@ where $\pi_{ij}=Pr(y_{ij}=1)$ and $b_{0j}\overset{\text{iid}}{\sim} N(0,\sigma^2
 
 * $i$ indexes observation
 
-* $P_{ij}$ is the Party code
+* $P_{ij}$ is the Party code ($k_p \in \{DEM,\ LIB,\ REP,\ UNA \}$)
 
-* $R_{ij}$ is the Race code
+* $R_{ij}$ is the Race code ($k_r \in \{Undesignated,\ B,\ W,\ A,\ I,\ O\}$)
 
-* $E_{ij}$ is the Ethnic code
+* $E_{ij}$ is the Ethnic code ($k_e \in \{NL,\ UN\}$)
 
-* $S_{ij}$ is the sex code
+* $S_{ij}$ is the sex code ($k_s \in \{M,\ U\}$)
 
-* $A_{ij}$ is the Age group
+* $A_{ij}$ is the Age group ($k_a \in \{Age \ 20-40,\ Age \ 41-65,\ Age \ Over \ 66\}$)
 
 ```{r, cache = T, echo = FALSE}
 # initial
@@ -658,40 +662,6 @@ ggroc(rocobj, size=1) +
   geom_abline(intercept=1, slope=1, linetype="dashed", color="red") +
   labs(title=paste("AUC:", round(rocobj$auc, 3))) +
   theme_bw()
-# fit model on full data
-
-# Fixed Effects
-# temp <- chart_fixef(mod6)
-# 
-#   temp[1:50,] %>%
-#     kable(digits=3) %>%
-#     kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
-#     kable_classic()
-#   
-#   temp[51:56,] %>%
-#     kable(digits=3) %>%
-#     kable_styling(full_width=FALSE,latex_options = c("hold_position", "repeat_header")) %>%
-#     kable_classic()
-
-# Uncomment below to show values for random effects in appendix
-
-# labs.df <- as.data.frame(ranef(mod6))
-# labs.df <- labs.df %>% 
-#   mutate(Lower = condval - 2*condsd) %>%
-#   mutate(Upper = condval + 2*condsd) %>%
-#   mutate(Estimate = exp(condval)) %>%
-#   mutate(SD = exp(condsd)) %>% 
-#   mutate(lower = Estimate - 2*SD) %>%
-#   mutate(upper = Estimate + 2*SD)
-#   
-# labs.df <- labs.df[, 3:11]
-# colnames(labs.df) <- c("County", "Estimate", "SD","Lower", "Upper", "E.Estimate", "E.SD", "E.Lower", "E.Upper")
-# 
-# kable(labs.df[,c(1, 6,8:9)], digits = 3)
-
-
-# # Random Effects
-# dotplot(ranef(mod6))$county_desc
 
 ```
 
@@ -871,4 +841,955 @@ An over 66 year old voter with undesignated party has $e^{0.8719} = 2.3915$ time
 **Limitations:** Firstly, we dropped rows that contained missing values during data cleaning . While we are working with almost 2 million observations, we do have quite a few small demographic groups, especially for our interaction terms. A possible alternative would have been to impute values for the missing data so that we could keep as many rows as possible. Obviously imputation comes with it's own set of assumptions and limitations. In addition, we did not try poststratiﬁcation to re-adjust the proportions among demographic groups. This could lead to slightly biased result.
 
   
-  
+\newpage
+
+# Appendix
+
+```{r, echo = FALSE}
+# Explanation of abbreviations: https://s3.amazonaws.com/dl.ncsbe.gov/data/layout_ncvoter.txt
+# contains info about the aggregate counts of voters who actually voted by demographic variables
+
+votes <- read.table("history_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
+
+# contains info about the aggregate counts of registered voters by demographic variables
+registers <- read.table("voter_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
+```
+
+
+```{r, echo = FALSE}
+# set "" or " " to NA
+registers[registers == ""] <- NA
+registers[registers == " "] <- NA
+votes[votes == " "] <- NA
+
+# unique(registers$election_date) # "11/03/2020" NA 
+# unique(registers$stats_type) # "history" NA  
+# unique(registers$update_date) # "01/13/2021" NA     
+
+# remove above three columns
+
+registers <- registers %>%
+  dplyr::select(-election_date, -stats_type, -update_date)
+votes <- votes %>%
+  dplyr::select(-election_date, -stats_type, -update_date)
+
+votes <- votes %>%
+  mutate(total_voters = as.numeric(total_voters))
+
+registers <- registers %>%
+  mutate(total_voters2 = as.numeric(total_voters))
+
+```
+
+## EDA
+
+```{r, echo = FALSE}
+votes <- votes %>%
+  group_by(county_desc, age, party_cd, race_code, ethnic_code, sex_code) %>%
+  summarize(total_vot = sum(total_voters,na.rm =T))
+
+data <- registers %>%
+  group_by(county_desc, party_cd, race_code, ethnic_code, sex_code, age) %>%
+  summarize(total_reg = sum(total_voters2, na.rm= T)) %>%
+  left_join(votes, by = c("county_desc", "age", "party_cd", "race_code",
+                      "ethnic_code", "sex_code"))
+
+
+
+```
+
+
+```{r, echo = FALSE}
+data <- data %>%
+  mutate(total_vot = as.numeric(total_vot), 
+         total_reg = as.numeric(total_reg))
+         # county_desc = as.factor(county_desc), 
+         # party_cd = as.factor(party_cd), 
+         # race_code = as.factor(race_code), 
+         # sex_code = as.factor(sex_code), 
+         # ethnic_code = as.factor(ethnic_code), 
+         # age = as.factor(age))
+
+```
+
+```{r, echo = FALSE}
+data$total_vot <- ifelse(is.na(data$total_vot), 0, data$total_vot)
+
+data$total_vot <- ifelse(data$total_vot <= data$total_reg, data$total_vot, data$total_reg)
+
+data <- data %>%
+  drop_na()
+
+# 51883 rows
+```
+
+
+```{r, echo = FALSE}
+set.seed(10)
+counties <- sample(unique(data$county_desc), 30)
+
+data <- data %>%
+  filter(county_desc %in% counties)
+
+# 16439 rows
+```
+
+```{r, echo = FALSE}
+data$race_code <- recode_factor(data$race_code, M = "Multiracial", U = "Undesignated")
+data2 <- data %>%
+  drop_na() %>%
+  mutate(total_not_vote = total_reg - total_vot) %>%
+  pivot_longer(cols = c("total_vot", "total_not_vote"), names_to = "vote_or_not", values_to = "prob") %>%
+  mutate(vote_or_not = ifelse(vote_or_not == "total_vot", 1, 0)) %>%
+  mutate(row_expand = map(prob, ~rep_len(1, .x))) %>%
+  unnest(cols = c(row_expand)) %>%
+  dplyr::select(-prob, -row_expand)
+
+# 1,908,907 individuals
+```
+
+### Race
+
+```{r, warning= F, fig.width= 12, fig.height= 4, echo = FALSE}
+p3 <- data %>%
+  group_by(race_code) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg) %>%
+  dplyr::select(group = race_code, turnout_rate) %>%
+  ggplot( aes(x = group, y = turnout_rate)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Race") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  ggtitle("Turnout rate vs. Race") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    coord_flip()
+
+
+
+p4 <- data %>%
+  group_by(race_code) %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
+  ggplot( aes(x = race_code, y = n)) +
+  geom_bar(stat = "identity") +
+  ylim(0, 1200000) +
+  xlab("Race") + ylab("Sample size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
+  ggtitle("Registered Voters vs. Race") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  coord_flip()
+
+grid.arrange(p3,p4, nrow= 1)
+
+
+data$race_code <- droplevels(data$race_code, 'P')
+data <- data %>%
+  drop_na()
+```
+
+
+### Party
+
+```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE}
+p5 <- data %>%
+  group_by(party_cd) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg) %>%
+  dplyr::select(group = party_cd, turnout_rate) %>%
+  ggplot( aes(x = group, y = turnout_rate)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Party") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  ggtitle("Turnout rate vs. Party") +
+    theme(plot.title = element_text(hjust = 0.5))  +
+    coord_flip()
+
+p6 <- data %>%
+  group_by(party_cd) %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
+  ggplot( aes(x = party_cd, y = n)) +
+  geom_bar(stat = "identity") +
+  ylim(0, 800000) +
+  xlab("Party") + ylab("Sample size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
+  ggtitle("Registered Voters vs. Party") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  coord_flip()
+
+grid.arrange(p5,p6, nrow= 1)
+
+
+# "CST","GRE" have small smaple size (50,25) and similar turnout rate (0.16,0.15)
+data$party_cd <- ifelse(data$party_cd %in% c("CST","GRE"),"CST_GRE",as.character(data$party_cd))
+
+
+```
+
+### Ethnic
+
+```{r, warning= F, fig.width= 10, fig.height= 3, echo = FALSE}
+p7 <- data %>%
+  group_by(ethnic_code) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg) %>%
+  dplyr::select(group = ethnic_code, turnout_rate) %>%
+  ggplot( aes(x = group, y = turnout_rate)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Ethnic") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  ggtitle("Turnout rate vs. Ethnic") +
+    theme(plot.title = element_text(hjust = 0.5))+
+    coord_flip()
+
+p8 <- data %>%
+  group_by(ethnic_code) %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
+  ggplot( aes(x = ethnic_code, y = n)) +
+  geom_bar(stat = "identity") +
+  ylim(0, 1500000) +
+  xlab("Ethnic") + ylab("Sample size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
+  ggtitle("Registered Voters vs. Ethnic") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  coord_flip()
+
+grid.arrange(p7,p8, nrow= 1)
+
+```
+
+### Sex
+
+```{r, warning= F, fig.width= 10, fig.height= 3, echo = FALSE}
+ p9 <- data %>%
+  group_by(sex_code) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg) %>%
+  dplyr::select(group = sex_code, turnout_rate) %>%
+  ggplot( aes(x = group, y = turnout_rate)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Sex") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  ggtitle("Turnout rate vs. Sex") +
+    theme(plot.title = element_text(hjust = 0.5)) + 
+    coord_flip()
+
+p10 <- data %>%
+  group_by(sex_code) %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
+  ggplot( aes(x = sex_code, y = n)) +
+  geom_bar(stat = "identity") +
+  ylim(0, 1000000) +
+  xlab("Sex") + ylab("Sample size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
+  ggtitle("Registered Voters vs. Sex") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  coord_flip()
+
+grid.arrange(p9,p10, nrow= 1)
+```
+
+### Age
+
+```{r, warning= F, fig.width= 10, fig.height= 4, echo = FALSE}
+p11 <- data %>%
+  group_by(age) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg) %>%
+  dplyr::select(group = age, turnout_rate) %>%
+  ggplot( aes(x = group, y = turnout_rate)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Age") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  ggtitle("Turnout rate vs. Age") +
+    theme(plot.title = element_text(hjust = 0.5))+
+    coord_flip()
+
+p12 <- data %>%
+  group_by(age) %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
+  ggplot( aes(x = age, y = n)) +
+  geom_bar(stat = "identity") +
+  ylim(0, 850000) +
+  xlab("Age") + ylab("Sample size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
+  ggtitle("Registered Voters vs. Age") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  ylim(0,8.8e05) +
+  coord_flip()
+
+grid.arrange(p11,p12, nrow= 1)
+
+```
+
+## Model Estimates
+
+```{r, echo = FALSE}
+chart_fixef(mod6) %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects", longtable = T,
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "repeat_header")) %>%
+    kable_classic()
+```
+
+```{r, echo = FALSE}
+ranef(mod6, condVar = TRUE) %>%
+  as.data.frame() %>%
+  arrange(desc(condval)) %>%
+  mutate(`exp(condval)` = exp(condval)) %>%
+  kable(caption = "Estimated random intercepts",longtable = T, 
+        digits =4, format = "markdown") %>%
+  kable_styling(latex_options = c("HOLD_position", "repeat_header"))
+```
+
+
+
+\newpage
+
+# Codes
+
+```{r, eval=FALSE}
+knitr::opts_chunk$set(cache = T, message = F, warning =F)
+library(tidyverse)
+library(lme4)
+library(pROC)
+library(kableExtra)
+library(performance)
+library(lattice)
+library(brms)
+library(reshape2)
+library(dplyr)
+library(gridExtra)
+library(cowplot)
+library(arm)
+library(knitr)
+```
+
+```{r, eval=FALSE}
+# Explanation of abbreviations: https://s3.amazonaws.com/dl.ncsbe.gov/data/layout_ncvoter.txt
+# contains info about the aggregate counts of voters who actually voted by demographic variables
+
+votes <- read.table("history_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
+
+# contains info about the aggregate counts of registered voters by demographic variables
+registers <- read.table("voter_stats_20201103.txt", header = TRUE, fill = TRUE, sep = '\t')
+```
+
+```{r, eval=FALSE}
+# set "" or " " to NA
+registers[registers == ""] <- NA
+registers[registers == " "] <- NA
+votes[votes == " "] <- NA
+
+# unique(registers$election_date) # "11/03/2020" NA 
+# unique(registers$stats_type) # "history" NA  
+# unique(registers$update_date) # "01/13/2021" NA     
+
+# remove above three columns
+
+registers <- registers %>%
+  dplyr::select(-election_date, -stats_type, -update_date)
+votes <- votes %>%
+  dplyr::select(-election_date, -stats_type, -update_date)
+
+votes <- votes %>%
+  mutate(total_voters = as.numeric(total_voters))
+
+registers <- registers %>%
+  mutate(total_voters2 = as.numeric(total_voters))
+
+```
+
+```{r, eval=FALSE}
+votes <- votes %>%
+  group_by(county_desc, age, party_cd, race_code, ethnic_code, sex_code) %>%
+  summarize(total_vot = sum(total_voters,na.rm =T))
+
+data <- registers %>%
+  group_by(county_desc, party_cd, race_code, ethnic_code, sex_code, age) %>%
+  summarize(total_reg = sum(total_voters2, na.rm= T)) %>%
+  left_join(votes, by = c("county_desc", "age", "party_cd", "race_code",
+                      "ethnic_code", "sex_code"))
+
+
+
+```
+
+```{r, echo = FALSE}
+data <- data %>%
+  mutate(total_vot = as.numeric(total_vot), 
+         total_reg = as.numeric(total_reg))
+         # county_desc = as.factor(county_desc), 
+         # party_cd = as.factor(party_cd), 
+         # race_code = as.factor(race_code), 
+         # sex_code = as.factor(sex_code), 
+         # ethnic_code = as.factor(ethnic_code), 
+         # age = as.factor(age))
+
+```
+
+```{r, eval=FALSE}
+data$total_vot <- ifelse(is.na(data$total_vot), 0, data$total_vot)
+
+data$total_vot <- ifelse(data$total_vot <= data$total_reg, data$total_vot, data$total_reg)
+
+data <- data %>%
+  drop_na()
+
+# 51883 rows
+```
+
+```{r, eval=FALSE}
+set.seed(10)
+counties <- sample(unique(data$county_desc), 30)
+
+data <- data %>%
+  filter(county_desc %in% counties)
+
+# 16439 rows
+```
+
+```{r, eval=FALSE}
+data$race_code <- recode_factor(data$race_code, M = "Multiracial", U = "Undesignated")
+data2 <- data %>%
+  drop_na() %>%
+  mutate(total_not_vote = total_reg - total_vot) %>%
+  pivot_longer(cols = c("total_vot", "total_not_vote"), names_to = "vote_or_not", values_to = "prob") %>%
+  mutate(vote_or_not = ifelse(vote_or_not == "total_vot", 1, 0)) %>%
+  mutate(row_expand = map(prob, ~rep_len(1, .x))) %>%
+  unnest(cols = c(row_expand)) %>%
+  dplyr::select(-prob, -row_expand)
+
+# 1,908,907 individuals
+```
+
+```{r, eval=FALSE}
+table(data2$vote_or_not)
+
+turnout_rate <- sum(data$total_vot) / sum(data$total_reg)
+data.frame(group = "Total", turnout_rate = turnout_rate)
+```
+
+```{r, eval=FALSE}
+p1 <- data %>%
+  group_by(county_desc) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop",
+            n = sum(total_reg)) %>%
+  mutate(turnout_rate = total_vot / total_reg) %>%
+  ggplot( aes(x = fct_reorder(county_desc,n), y = turnout_rate)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("County") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  ggtitle("Turnout Rate by County") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  geom_hline(yintercept = turnout_rate, color = 'red') +
+  coord_flip() 
+
+p2 <- data %>%
+  group_by(county_desc) %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
+  ggplot( aes(x = fct_reorder(county_desc,n), y = n)) +
+  geom_bar(stat = "identity") +
+  ylim(0, 300000) +
+  xlab("Party") + ylab("Sample size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
+  ggtitle("Registered Voters by County") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  ylim(0,3.15e5) +
+  coord_flip() 
+
+ grid.arrange(p1,p2, nrow= 1)
+```
+
+```{r, eval=FALSE}
+p3 <- data %>%
+  group_by(race_code) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg) %>%
+  dplyr::select(group = race_code, turnout_rate) %>%
+  ggplot( aes(x = group, y = turnout_rate)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Race") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  ggtitle("Turnout rate vs. Race") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    coord_flip()
+
+
+
+p4 <- data %>%
+  group_by(race_code) %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
+  ggplot( aes(x = race_code, y = n)) +
+  geom_bar(stat = "identity") +
+  xlab("Race") + ylab("Sample size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
+  ggtitle("Registered Voters vs. Race") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  coord_flip()
+
+grid.arrange(p3,p4, nrow= 1)
+
+
+data$race_code <- droplevels(data$race_code, 'P')
+data <- data %>%
+  drop_na()
+```
+
+```{r, eval=FALSE}
+p5 <- data %>%
+  group_by(party_cd) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg) %>%
+  dplyr::select(group = party_cd, turnout_rate) %>%
+  ggplot( aes(x = group, y = turnout_rate)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Party") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  ggtitle("Turnout rate vs. Party") +
+    theme(plot.title = element_text(hjust = 0.5))  +
+    coord_flip()
+
+p6 <- data %>%
+  group_by(party_cd) %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
+  ggplot( aes(x = party_cd, y = n)) +
+  geom_bar(stat = "identity") +
+  xlab("Party") + ylab("Sample size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
+  ggtitle("Registered Voters vs. Party") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  coord_flip()
+
+grid.arrange(p5,p6, nrow= 1)
+
+
+# "CST","GRE" have small smaple size (50,25) and similar turnout rate (0.16,0.15)
+data$party_cd <- ifelse(data$party_cd %in% c("CST","GRE"),"CST_GRE",as.character(data$party_cd))
+
+
+```
+
+```{r, eval=FALSE}
+p7 <- data %>%
+  group_by(ethnic_code) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg) %>%
+  dplyr::select(group = ethnic_code, turnout_rate) %>%
+  ggplot( aes(x = group, y = turnout_rate)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Ethnic") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  ggtitle("Turnout rate vs. Ethnic") +
+    theme(plot.title = element_text(hjust = 0.5))+
+    coord_flip()
+
+p8 <- data %>%
+  group_by(ethnic_code) %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
+  ggplot( aes(x = ethnic_code, y = n)) +
+  geom_bar(stat = "identity") +
+  xlab("Ethnic") + ylab("Sample size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
+  ggtitle("Registered Voters vs. Ethnic") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  coord_flip()
+
+grid.arrange(p7,p8, nrow= 1)
+
+```
+
+```{r, eval=FALSE}
+ p9 <- data %>%
+  group_by(sex_code) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg) %>%
+  dplyr::select(group = sex_code, turnout_rate) %>%
+  ggplot( aes(x = group, y = turnout_rate)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Sex") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  ggtitle("Turnout rate vs. Sex") +
+    theme(plot.title = element_text(hjust = 0.5)) + 
+    coord_flip()
+
+p10 <- data %>%
+  group_by(sex_code) %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
+  ggplot( aes(x = sex_code, y = n)) +
+  geom_bar(stat = "identity") +
+  xlab("Sex") + ylab("Sample size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
+  ggtitle("Registered Voters vs. Sex") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  coord_flip()
+
+grid.arrange(p9,p10, nrow= 1)
+```
+
+```{r, eval=FALSE}
+p11 <- data %>%
+  group_by(age) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg) %>%
+  dplyr::select(group = age, turnout_rate) %>%
+  ggplot( aes(x = group, y = turnout_rate)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Age") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  ggtitle("Turnout rate vs. Age") +
+    theme(plot.title = element_text(hjust = 0.5))+
+    coord_flip()
+
+p12 <- data %>%
+  group_by(age) %>%
+  summarize(n = sum(total_reg), .groups="drop") %>%
+  ggplot( aes(x = age, y = n)) +
+  geom_bar(stat = "identity") +
+  xlab("Age") + ylab("Sample size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.1) +
+  ggtitle("Registered Voters vs. Age") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+  ylim(0,8.8e05) +
+  coord_flip()
+
+grid.arrange(p11,p12, nrow= 1)
+
+```
+
+```{r, eval=FALSE}
+p13 <- data %>%
+  group_by(sex_code, party_cd) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg,
+         group = paste0(sex_code, " with ", party_cd)) %>%
+  dplyr::select(group = group, turnout_rate, sex_code, party_cd) %>%
+  ggplot( aes(x = group, y = turnout_rate, fill = party_cd)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Sex * Party") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  coord_flip() +
+  ggtitle("Turnout rate vs. Sex*Party") +
+    theme(plot.title = element_text(hjust = 0.5))
+
+p14 <- data %>%
+  group_by(sex_code, party_cd) %>%
+  summarize(n = sum(total_reg), .groups = "drop") %>%
+  mutate(group = paste0(sex_code, " with ", party_cd)) %>%
+  ggplot( aes(x = group, y = n, fill = party_cd)) +
+  geom_bar(stat = "identity") +
+  xlab("Sex * Party") + ylab("Size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.05) +
+  coord_flip() +
+  ggtitle("Registered Voters vs. Sex*Party") +
+    theme(plot.title = element_text(hjust = 0.5))
+
+legend <- get_legend(p13)
+
+grid.arrange(widths = c(3, 3, 1),p13 + theme(legend.position="none"),
+             p14 + theme(legend.position="none"), nrow= 1,legend)
+```
+
+```{r, eval=FALSE}
+p15 <- data %>%
+  group_by(age, party_cd) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg,
+         group = paste0(age, " with ", party_cd)) %>%
+  dplyr::select(group = group, turnout_rate, age, party_cd) %>%
+  ggplot( aes(x = group, y = turnout_rate, fill = party_cd)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Age * Party") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  coord_flip() +
+  ggtitle("Turnout rate vs. Age*Party") +
+    theme(plot.title = element_text(hjust = 0.5))
+
+p16 <- data %>%
+  group_by(age, party_cd) %>%
+  summarize(n = sum(total_reg), .groups = "drop") %>%
+  mutate(group = paste0(age, " with ", party_cd)) %>%
+  ggplot( aes(x = group, y = n, fill = party_cd)) +
+  geom_bar(stat = "identity") +
+  xlab("Age * Party") + ylab("Size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.05) +
+  coord_flip() +
+  ggtitle("Registered Voters vs. Age*Party") +
+    theme(plot.title = element_text(hjust = 0.5))
+
+legend <- get_legend(p15)
+
+grid.arrange(widths = c(3, 3, 1),p15 + theme(legend.position="none"),
+             p16 + theme(legend.position="none"), nrow= 1,legend)
+
+```
+
+```{r, eval=FALSE}
+p17 <- data %>%
+  group_by(age, race_code) %>%
+  summarise(total_reg = sum(total_reg),
+            total_vot = sum(total_vot), .groups = "drop") %>%
+  mutate(turnout_rate = total_vot / total_reg,
+         group = paste0(age, " with ", race_code)) %>%
+  dplyr::select(group = group, turnout_rate, age, race_code) %>%
+  ggplot( aes(x = group, y = turnout_rate, fill = race_code)) +
+  geom_bar(stat = "identity") +
+  ylim(0,1) +
+  xlab("Age * Race") + ylab("Turnout rate") +
+  geom_text(aes(label=format(turnout_rate, digits = 2)), hjust = -0.3) +
+  coord_flip() +
+  ggtitle("Turnout rate vs. Age*Race") +
+    theme(plot.title = element_text(hjust = 0.5))
+
+p18 <- data %>%
+  group_by(age, race_code) %>%
+  summarize(n = sum(total_reg), .groups = "drop") %>%
+  mutate(group = paste0(age, " with ", race_code)) %>%
+  ggplot( aes(x = group, y = n, fill = race_code)) +
+  geom_bar(stat = "identity") +
+  xlab("Age * Race") + ylab("Size") +
+  geom_text(aes(label=format(n, digits = 2)), hjust = -0.05) +
+  coord_flip() +
+  ggtitle("Registered Voters vs. Age*Race") +
+    theme(plot.title = element_text(hjust = 0.5))
+
+legend <- get_legend(p17)
+
+grid.arrange(widths = c(3, 3, 1),p17 + theme(legend.position="none"),
+             p18 + theme(legend.position="none"), nrow= 1,legend)
+
+
+```
+
+```{r, eval=FALSE}
+data <- data %>%
+  mutate(total_vot = as.numeric(total_vot), 
+         total_reg = as.numeric(total_reg),
+         county_desc = as.factor(county_desc),
+         party_cd = as.factor(as.character(party_cd)),
+         race_code = as.factor(race_code),
+         sex_code = as.factor(sex_code),
+         ethnic_code = as.factor(ethnic_code),
+         age = as.factor(age))
+
+```
+
+```{r, eval=FALSE}
+# initial
+mod1 <- glmer(cbind(total_vot, total_reg - total_vot) ~
+                      party_cd  + sex_code + age + (1|county_desc),
+                    data = data, family = binomial,
+              control=glmerControl(optimizer = "bobyqa"))
+
+
+mod2 <- glmer(cbind(total_vot, total_reg - total_vot) ~
+                      party_cd + race_code  + sex_code + age + (1|county_desc),
+                    data = data, family = binomial,
+              control=glmerControl(optimizer = "bobyqa"))
+
+
+mod3 <- glmer(cbind(total_vot, total_reg - total_vot) ~
+                      party_cd + race_code + ethnic_code + sex_code + age + (1|county_desc),
+                    data = data, family = binomial,
+              control=glmerControl(optimizer = "bobyqa"))
+
+
+mod4 <- glmer(cbind(total_vot, total_reg - total_vot) ~
+                      -1 + race_code + ethnic_code + sex_code + age + (1 | county_desc),
+                    data = data, family = binomial,
+              control=glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=2e5)))
+
+
+mod5 <- glmer(cbind(total_vot, total_reg - total_vot) ~
+                  party_cd + race_code + ethnic_code + sex_code + age +
+                  sex_code:party_cd + age:party_cd + (1|county_desc),
+                data = data, family = binomial,
+              control=glmerControl(optimizer = "bobyqa", optCtrl=list(maxfun=2e5)))
+
+
+mod6 <- glmer(cbind(cbind(total_vot, total_reg - total_vot)) ~
+                  party_cd + race_code + ethnic_code + sex_code + age +
+                  sex_code:party_cd + age:party_cd + age:race_code + (1|county_desc),
+                data = data, family = binomial,
+      control=glmerControl(optimizer = "bobyqa",optCtrl=list(maxfun=2e5)))
+
+```
+
+```{r, eval=FALSE}
+
+model <- c("Base model",
+           "Add race",
+           "Add race and ethnic",
+           "Without intercept",
+           "Add the interaction of sex:party, and age:party",
+           "Add the interaction of sex:party, age:party, and age:race")
+LRT <- c("",
+         round(anova(mod1,mod2)$`Pr(>Chisq)`[2],4),
+         round(anova(mod2,mod3)$`Pr(>Chisq)`[2],4),
+         round(anova(mod3,mod4)$`Pr(>Chisq)`[2],4),
+         round(anova(mod3,mod5)$`Pr(>Chisq)`[2],4),
+         round(anova(mod3,mod6)$`Pr(>Chisq)`[2],4))
+BIC_score <- sapply(c(mod1, mod2, mod3, mod4, mod5, mod6), BIC)
+AIC_score <- sapply(c(mod1, mod2, mod3, mod4,mod5, mod6), AIC)
+data.frame("Model" = model, 'LRT p-value' = LRT, 'AIC' = AIC_score, 'BIC' = BIC_score) %>%
+  kable(caption = "Forward model selection") %>%
+    kable_styling(latex_options = c("HOLD_position","striped"))
+
+```
+
+```{r, eval=FALSE}
+chart_fixef <- function(model) {
+ summary(model)$coefficients %>%
+    as.data.frame() %>%
+    mutate(`95% lower` = round(Estimate - 1.96 * `Std. Error`, 4),
+           `95% upper` = round(Estimate + 1.96 * `Std. Error`, 4)) %>%
+    dplyr::select(Estimate, `Std. Error`, `95% lower`, `95% upper`)
+}
+```
+
+```{r, eval=FALSE}
+# test <- binned_residuals(mod6)
+binnedplot(fitted(mod6), y = resid(mod6))
+
+
+# expand data from aggregated format
+data_expand <- data %>%
+  mutate(resp = map2(total_vot, total_reg, ~ c(
+    rep(1, .x), rep(0, .y - .x)
+  ))) %>%
+  unnest(cols = c(resp)) %>%
+  dplyr::select(-c(total_reg, total_vot))
+
+# split into train and test
+sample <- sample(c(TRUE, FALSE), nrow(data_expand), replace=TRUE, prob=c(0.7,0.3))
+train <- data_expand[sample,]
+test <- data_expand[!sample,]
+
+# fit model on train data
+
+### fit any model you like on unaggregated train data 
+### will take a while...
+
+predicted <- predict(mod6, test, type="response")
+rocobj <- roc(test$resp, predicted)
+
+
+ggroc(rocobj, size=1) +
+  coord_fixed() +
+  scale_x_reverse(
+    name = "Specificity", 
+    limits = c(1,0), 
+    expand = c(0.001,0.001)
+  ) + 
+  scale_y_continuous(
+    name = "Sensitivity", 
+    limits = c(0,1), 
+    expand = c(0.001, 0.001)
+  ) +
+  geom_abline(intercept=1, slope=1, linetype="dashed", color="red") +
+  labs(title=paste("AUC:", round(rocobj$auc, 3))) +
+  theme_bw()
+
+```
+
+```{r, eval=FALSE}
+chart_fixef(mod6)[2:5,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Party",
+        digits=4, format = "markdown") %>%
+  kable_styling(latex_options = c("HOLD_position","striped"))
+
+```
+
+```{r, eval=FALSE}
+chart_fixef(mod6)[6:11,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Race",
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
+    kable_classic()
+```
+
+```{r, eval=FALSE}
+chart_fixef(mod6)[12:13,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Ethnic",
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
+    kable_classic()
+```
+
+```{r, eval=FALSE}
+chart_fixef(mod6)[14:15,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Sex",
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
+    kable_classic()
+```
+
+```{r, eval=FALSE}
+chart_fixef(mod6)[16:18,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Age",
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
+    kable_classic()
+```
+
+```{r, eval=FALSE}
+dotplot(ranef(mod6))$county_desc
+```
+
+```{r, eval=FALSE}
+chart_fixef(mod6)[19:26,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Party:Sex",
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
+    kable_classic()
+```
+
+```{r, eval=FALSE}
+chart_fixef(mod6)[27:38,] %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects for Party:Age",
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "striped")) %>%
+    kable_classic()
+```
+
+```{r, eval=FALSE}
+chart_fixef(mod6) %>%
+  kable(caption = "Estiamtes and 95% CI of Fixed Effects", longtable = T,
+        digits=4, format = "markdown") %>%
+  kable_styling(full_width=FALSE,latex_options = c("HOLD_position", "repeat_header")) %>%
+    kable_classic()
+```
+
+```{r, eval=FALSE}
+ranef(mod6, condVar = TRUE) %>%
+  as.data.frame() %>%
+  arrange(desc(condval)) %>%
+  mutate(`exp(condval)` = exp(condval)) %>%
+  kable(caption = "Estimated random intercepts",longtable = T, 
+        digits =4, format = "markdown") %>%
+  kable_styling(latex_options = c("HOLD_position", "repeat_header"))
+```
