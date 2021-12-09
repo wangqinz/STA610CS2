@@ -617,7 +617,7 @@ chart_fixef <- function(model) {
 
 ### Model Assessment
 
-From our EDA it can reasonably be assumed that the linearity condition is met for our model and that multicollinearity is not an issue. As we see in the binned residual plot below, there may cause for some concern as some points with expected values between 0.8 and 0.9 fall out of the range of the confidence bands. However, relative to the amount of data we have, these 8 points, in addition to 7 other scattered points outside the confidence bands, don't point to our model being incorrect. We see that the model has an AUC around 0.7 which is satisfactory and much better than a coin flip. Our model seems to more accurately identify positives than negatives as well. 
+From our EDA, and the amount of data we have, it can reasonably be assumed that the linearity condition is met for our model and that multicollinearity is not an issue. As we see in the binned residual plot below, there may be cause for some concern as some points with expected values between 0.8 and 0.9 fall out of the range of the confidence bands. However, relative to the amount of data we have, these 8 points, in addition to 7 other scattered points outside the confidence bands, don't point to our model being incorrect. We see that the model has an AUC around 0.7 which is satisfactory and much better than a coin flip. Our model seems to more accurately identify positives than negatives as well. 
 
 
 ```{r, echo = FALSE, fig.width = 4, fig.height = 3 }
@@ -804,7 +804,7 @@ chart_fixef(mod6)[19:26,] %>%
     kable_classic()
 ```
 
-From the table above, only the fixed effects for `party_cdLIB:sex_codeU` is significant (the 95% CI does not cover 0). For simplicity, we only interpret this fixed effect: A Libertarian voter with undesignated gender has $e^{0.4754} = 1.6087$ times the odds of voting.
+From the table above, only the fixed effects for `party_cdLIB:sex_codeU` is significant (the 95% CI does not cover 0). For simplicity, we only interpret this fixed effect: A Libertarian voter with undesignated gender has $e^{0.4754} = 1.6087$ times the odds of voting as a female of the same party, holding all other predictors unchanged.
 
 
 **Q4: How did the turnout rates differ between age groups for the different party affiliations?**
@@ -820,25 +820,25 @@ chart_fixef(mod6)[27:38,] %>%
 
 From the table above, we see some of the fixed effects are significant, we only interpret them:
 
-A 26-40 year old Democratic voter has $e^{-0.2391} = 0.7873$ times the odds of voting.
+A 26-40 year old Democratic voter has $e^{-0.2391} = 0.7873$ times the odds of voting
 
-A 41-65 year old Democratic voter has $e^{0.4162} = 1.5162$ times the odds of voting.
+A 41-65 year old Democratic voter has $e^{0.4162} = 1.5162$ times the odds of voting
 
-A 41-65 year old Republican voter has $e^{0.5018} = 1.6517$ times the odds of voting.
+A 41-65 year old Republican voter has $e^{0.5018} = 1.6517$ times the odds of voting
 
-A 41-65 year old voter with undesignated party has $e^{0.5563} = 1.7442$ times the odds of voting.
+A 41-65 year old voter with undesignated party has $e^{0.5563} = 1.7442$ times the odds of voting
 
-An over 66 year old Republican voter has $e^{0.5102} = 1.6656$ times the odds of voting.
+An over 66 year old Republican voter has $e^{0.5102} = 1.6656$ times the odds of voting
 
-An over 66 year old voter with undesignated party has $e^{0.8719} = 2.3915$ times the odds of voting.
+An over 66 year old voter with undesignated party has $e^{0.8719} = 2.3915$ times the odds of voting
 
-
+as a 18-25 year old of the same party, holding all other predictors unchanged.
 
 ## Strengths and Limitations
 
 **Strengths:** A major strength of our model is the inclusion of random intercepts by county which allows us to understand the difference in turnout rate between each county. 
 
-**Limitations:** Firstly, we dropped rows that contained missing values during data cleaning . While we are working with almost 2 million observations, we do have quite a few small demographic groups, especially for our interaction terms. A possible alternative would have been to impute values for the missing data so that we could keep as many rows as possible. Obviously imputation comes with it's own set of assumptions and limitations. In addition, we did not try poststratiﬁcation to re-adjust the proportions among demographic groups. This could lead to slightly biased result.
+**Limitations:** Firstly, we dropped rows that contained missing values during data cleaning. While we are working with almost 2 million observations, we do have quite a few small demographic groups, especially for our interaction terms. A possible alternative would have been to impute values for the missing data so that we could keep as many rows as possible. Obviously imputation comes with it's own set of assumptions and limitations. In addition, we did not try poststratiﬁcation to re-adjust the proportions among demographic groups. This could lead to slightly biased result.
 
   
 \newpage
